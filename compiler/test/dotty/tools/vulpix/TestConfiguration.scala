@@ -30,6 +30,10 @@ object TestConfiguration {
     Properties.dottyLibrary
   ))
 
+  val silenceOptions = Array(
+    "-Wconf:id=E222:s", // name=EncodedPackageName don't warn about file names with hyphens
+  )
+
   val withCompilerClasspath = mkClasspath(List(
     Properties.scalaLibrary,
     Properties.scalaAsm,
@@ -63,7 +67,7 @@ object TestConfiguration {
 
   val yCheckOptions = Array("-Ycheck:all")
 
-  val commonOptions = Array("-indent") ++ checkOptions ++ noCheckOptions ++ yCheckOptions
+  val commonOptions = Array("-indent") ++ checkOptions ++ noCheckOptions ++ yCheckOptions ++ silenceOptions
   val defaultOptions = TestFlags(basicClasspath, commonOptions)
   val unindentOptions = TestFlags(basicClasspath, Array("-no-indent") ++ checkOptions ++ noCheckOptions ++ yCheckOptions)
   val withCompilerOptions =
