@@ -94,6 +94,8 @@ case class ScalaPresentationCompiler(
           implementAbstractMembers(params)
         case (CodeActionId.InsertInferredType, _) =>
           insertInferredType(params)
+        case (CodeActionId.InsertInferredMethod, _) =>
+          insertInferredMethod(params)
         case (CodeActionId.InlineValue, _) =>
           inlineValue(params)
         case (CodeActionId.ExtractMethod, Some(extractionPos: OffsetParams)) =>
@@ -353,6 +355,23 @@ case class ScalaPresentationCompiler(
         .inferredTypeEdits()
         .asJava
     }(params.toQueryContext)
+  end insertInferredType
+
+  def insertInferredMethod(
+      params: OffsetParams
+  ): CompletableFuture[ju.List[l.TextEdit]] =
+    val empty: Either[String, List[l.TextEdit]] = Right(List())
+    compilerAccess.withNonInterruptableCompiler(
+      empty,
+      params.token()
+    ) { pc =>
+      new InferredMethodProvider(params, pc.compiler(), config, search)
+        .inferredMethodEdits()
+    }(params.toQueryContext)
+      .thenApply {
+        case Right(edits) => edits.asJava
+        case Left(error) => throw new DisplayableException(error)
+      }
 
   override def inlineValue(
       params: OffsetParams
