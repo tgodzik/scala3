@@ -1,12 +1,19 @@
-package dotty.tools
+package dotty
+package tools
 package dotc
 package reporting
 
-import scala.language.unsafeNulls
-import java.io.{BufferedReader, FileInputStream, FileOutputStream, FileReader, PrintStream, PrintWriter, StringReader, StringWriter, File as JFile}
+import java.io.{File as JFile, *}
+import java.nio.file.Files.readAllLines
 import java.text.SimpleDateFormat
 import java.util.Date
+
+import core.Contexts.*
 import core.Decorators.*
+import interfaces.Diagnostic.{ERROR, WARNING}
+import io.AbstractFile
+import util.SourcePosition
+import Diagnostic.*
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
@@ -29,12 +36,16 @@ extends Reporter with UniqueMessagePositions with HideNonSensicalMessages with M
   final def messages: Iterator[String] = _messageBuf.iterator
 
   protected final val _consoleBuf = new StringWriter
-  protected final val _consoleReporter = new ConsoleReporter(null, new PrintWriter(_consoleBuf))
+  protected final val _consoleReporter = new ConsoleReporter(null, new PrintWriter(_consoleBuf)):
+    override protected def renderPath(file: AbstractFile): String = TestReporter.renderPath(file)
+
   final def consoleOutput: String = _consoleBuf.toString
 
   private var _skip: Boolean = false
   final def setSkip(): Unit = _skip = true
   final def skipped: Boolean = _skip
+
+  override protected def renderPath(file: AbstractFile): String = TestReporter.renderPath(file)
 
   protected final def inlineInfo(pos: SourcePosition)(using Context): String =
     if (pos.exists) {
@@ -149,10 +160,16 @@ object TestReporter {
       Properties.rerunFailed &&
         failedTestsFile.exists() &&
         failedTestsFile.isFile
-    )(java.nio.file.Files.readAllLines(failedTestsFile.toPath).asScala.toList)
+    )(readAllLines(failedTestsFile.toPath).asScala.toList)
 
   def writeFailedTests(tests: List[String]): Unit =
     initLog()
     tests.foreach(failed => failedTestsWriter.println(failed))
     failedTestsWriter.flush()
+
+  def renderPath(file: AbstractFile): String =
+    if JFile.separatorChar == '\\' then
+      file.path.replace('\\', '/')
+    else
+      file.path
 }
