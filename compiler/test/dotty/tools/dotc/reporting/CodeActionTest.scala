@@ -136,6 +136,49 @@ class CodeActionTest extends DottyTest:
          afterPhase = "patternMatcher"
       )
 
+  @Test def removeNN =
+    val ctxx = newContext
+    ctxx.setSetting(ctxx.settings.YexplicitNulls, true)
+    checkCodeAction(
+      code =
+        """|val s: String|Null = "foo".nn
+           |""".stripMargin,
+         title = "Remove unnecessary .nn",
+      expected =
+        """|val s: String|Null = "foo"
+           |""".stripMargin,
+      ctxx = ctxx
+      )
+
+
+  @Test def removeNN2 =
+    val ctxx = newContext
+    ctxx.setSetting(ctxx.settings.YexplicitNulls, true)
+    checkCodeAction(
+      code =
+        """val s: String|Null = null.nn
+           |""".stripMargin,
+         title = "Remove unnecessary .nn",
+      expected =
+        """val s: String|Null = null
+           |""".stripMargin,
+      ctxx = ctxx
+      )
+
+  @Test def addNN =
+    val ctxx = newContext
+    ctxx.setSetting(ctxx.settings.YexplicitNulls, true)
+    checkCodeAction(
+      code =
+        """val s: String|Null = ???
+          | val t: String = s""".stripMargin,
+        title = "Add .nn",
+      expected =
+        """val s: String|Null = ???
+          | val t: String = (s).nn""".stripMargin,
+      ctxx = ctxx
+      )
+
   // Make sure we're not using the default reporter, which is the ConsoleReporter,
   // meaning they will get reported in the test run and that's it.
   private def newContext =
