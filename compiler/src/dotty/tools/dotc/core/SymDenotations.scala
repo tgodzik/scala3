@@ -1185,7 +1185,7 @@ object SymDenotations {
       || is(Inline, butNot = Deferred)
       || is(JavaDefinedVal, butNot = Method)
       || isConstructor
-      || !owner.isExtensibleClass
+      || exists && !owner.isExtensibleClass
 
     /** A class is effectively sealed if has the `final` or `sealed` modifier, or it
      *  is defined in Scala 3 and is neither abstract nor open.
