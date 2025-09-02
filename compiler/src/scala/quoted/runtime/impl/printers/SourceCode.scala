@@ -4,6 +4,7 @@ package runtime.impl.printers
 import dotty.tools.dotc.util.Chars
 
 import scala.annotation.switch
+import scala.collection.mutable
 
 import java.lang.StringBuilder
 
@@ -1504,8 +1505,8 @@ object SourceCode {
       else
         qSc + text + qSc
 
-    private[this] val names = collection.mutable.Map.empty[Symbol, String]
-    private[this] val namesIndex = collection.mutable.Map.empty[String, Int]
+    private val names = collection.mutable.Map.empty[Symbol, String]
+    private val namesIndex = collection.mutable.Map.empty[String, Int]
 
     private def splicedName(sym: Symbol): Option[String] = {
       if sym.owner.isClassDef then None
