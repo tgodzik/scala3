@@ -176,6 +176,7 @@ private sealed trait WarningSettings:
   private val WenumCommentDiscard = BooleanSetting("-Wenum-comment-discard", "Warn when a comment ambiguously assigned to multiple enum cases is discarded.")
   private val WtoStringInterpolated = BooleanSetting("-Wtostring-interpolated", "Warn a standard interpolator used toString on a reference type.")
   private val WrecurseWithDefault = BooleanSetting("-Wrecurse-with-default", "Warn when a method calls itself with a default argument.")
+  private val WwrongArrow = BooleanSetting("-Wwrong-arrow", "Warn if function arrow was used instead of context literal ?=>.")
   private val Wunused: Setting[List[ChoiceWithHelp[String]]] = MultiChoiceHelpSetting(
     name = "-Wunused",
     helpArg = "warning",
@@ -295,6 +296,7 @@ private sealed trait WarningSettings:
     def toStringInterpolated(using Context): Boolean = allOr(WtoStringInterpolated)
     def recurseWithDefault(using Context): Boolean = allOr(WrecurseWithDefault)
     def checkInit(using Context): Boolean = allOr(YcheckInit)
+    def wrongArrow(using Context): Boolean = allOr(WwrongArrow)
 
 /** -X "Extended" or "Advanced" settings */
 private sealed trait XSettings:

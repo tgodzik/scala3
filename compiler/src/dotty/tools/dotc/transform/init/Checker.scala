@@ -46,7 +46,7 @@ class Checker extends Phase:
     cancellable {
       val classes = traverser.getClasses()
 
-      if ctx.settings.Whas.checkInit then
+      if ctx.settings.Whas.safeInit then
         Semantic.checkClasses(classes)(using checkCtx)
     }
 
