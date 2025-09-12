@@ -14,6 +14,6 @@
 //  duplicate pattern variable: given_Option_List
 
 def also =
-  given [A] => List[A] = ???
-  given [A] => List[A] = ??? // error
+  given [A]: List[A] = ???
+  given [A]: List[A] = ??? // error
   ()

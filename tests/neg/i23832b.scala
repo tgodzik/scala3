@@ -6,4 +6,4 @@ trait Special[A]
 
 object syntax:
   given Special[Option[Long]] = ???
-  given [A] => Special[Option[A]] = ??? // error
+  given [A]: Special[Option[A]] = ??? // error

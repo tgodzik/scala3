@@ -132,7 +132,7 @@ class CompilationTests {
       compileFilesInDir("tests/neg-deep-subtype", allowDeepSubtypes),
       compileFilesInDir("tests/neg-custom-args/captures", defaultOptions.and("-language:experimental.captureChecking")),
       compileFile("tests/neg-custom-args/sourcepath/outer/nested/Test1.scala", defaultOptions.and("-sourcepath", "tests/neg-custom-args/sourcepath")),
-      compileDir("tests/neg-custom-args/sourcepath2/hi", defaultOptions.and("-sourcepath", "tests/neg-custom-args/sourcepath2", "-Werror")),
+      compileDir("tests/neg-custom-args/sourcepath2/hi", defaultOptions.and("-sourcepath", "tests/neg-custom-args/sourcepath2", "-Xfatal-warnings")),
       compileList("duplicate source", List(
         "tests/neg-custom-args/toplevel-samesource/S.scala",
         "tests/neg-custom-args/toplevel-samesource/nested/S.scala"),
@@ -214,7 +214,7 @@ class CompilationTests {
     compileFilesInDir("tests/init/neg", options).checkExpectedErrors()
     compileFilesInDir("tests/init/warn", defaultOptions.and("-Ysafe-init")).checkWarnings()
     compileFilesInDir("tests/init/pos", options).checkCompile()
-    compileFilesInDir("tests/init/crash", options.without("-Werror")).checkCompile()
+    compileFilesInDir("tests/init/crash", options.without("-Xfatal-warnings")).checkCompile()
     // The regression test for i12128 has some atypical classpath requirements.
     // The test consists of three files: (a) Reflect_1  (b) Macro_2  (c) Test_3
     // which must be compiled separately. In addition:
@@ -223,7 +223,7 @@ class CompilationTests {
     //   - the output from (a) _must not_ be on the classpath while compiling (c)
     locally {
       val i12128Group = TestGroup("checkInit/i12128")
-      val i12128Options = options.without("-Werror")
+      val i12128Options = options.without("-Xfatal-warnings")
       val outDir1 = defaultOutputDir + i12128Group + "/Reflect_1/i12128/Reflect_1"
       val outDir2 = defaultOutputDir + i12128Group + "/Macro_2/i12128/Macro_2"
 
@@ -242,7 +242,7 @@ class CompilationTests {
      * an error when reading the files' TASTy trees. */
     locally {
       val tastyErrorGroup = TestGroup("checkInit/tasty-error/val-or-defdef")
-      val tastyErrorOptions = options.without("-Werror")
+      val tastyErrorOptions = options.without("-Xfatal-warnings")
 
       val classA0 = defaultOutputDir + tastyErrorGroup + "/A/v0/A"
       val classA1 = defaultOutputDir + tastyErrorGroup + "/A/v1/A"
@@ -265,7 +265,7 @@ class CompilationTests {
      * an error when reading the files' TASTy trees. This fact is demonstrated by the compilation of Main. */
     locally {
       val tastyErrorGroup = TestGroup("checkInit/tasty-error/typedef")
-      val tastyErrorOptions = options.without("-Werror").without("-Ycheck:all")
+      val tastyErrorOptions = options.without("-Xfatal-warnings").without("-Ycheck:all")
 
       val classC = defaultOutputDir + tastyErrorGroup + "/C/typedef/C"
       val classA0 = defaultOutputDir + tastyErrorGroup + "/A/v0/A"
