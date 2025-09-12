@@ -1657,7 +1657,7 @@ object desugar {
         case pat @ Bind(nme.WILDCARD, body) =>
           val name =
             body match
-            case Typed(Ident(nme.WILDCARD), tpt) if pat.mods.is(Given) => inventGivenName(tpt)
+            case Typed(Ident(nme.WILDCARD), tpt) if pat.mods.is(Given) => inventGivenOrExtensionName(tpt)
             case _ => UniqueName.fresh()
           (cpy.Bind(pat)(name, body).withMods(pat.mods), Ident(name))
         case Bind(name, _) => (pat, Ident(name))

@@ -1,5 +1,5 @@
 -- [E120] Naming Error: tests/neg/i23832b.scala:9:8 --------------------------------------------------------------------
-9 |  given [A] => Special[Option[A]] = ??? // error
+9 |  given [A]: Special[Option[A]] = ??? // error
   |        ^
   |        Conflicting definitions:
   |        final lazy given val given_Special_Option: Special[Option[Long]] in object syntax at line 8 and
