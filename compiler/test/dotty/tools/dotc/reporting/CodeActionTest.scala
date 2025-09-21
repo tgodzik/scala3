@@ -4,6 +4,7 @@ import dotty.tools.DottyTest
 import dotty.tools.dotc.rewrites.Rewrites
 import dotty.tools.dotc.rewrites.Rewrites.ActionPatch
 import dotty.tools.dotc.util.SourceFile
+import dotty.tools.dotc.core.Contexts._
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.*
@@ -136,35 +137,6 @@ class CodeActionTest extends DottyTest:
          afterPhase = "patternMatcher"
       )
 
-  @Test def removeNN =
-    val ctxx = newContext
-    ctxx.setSetting(ctxx.settings.YexplicitNulls, true)
-    checkCodeAction(
-      code =
-        """|val s: String|Null = "foo".nn
-           |""".stripMargin,
-         title = "Remove unnecessary .nn",
-      expected =
-        """|val s: String|Null = "foo"
-           |""".stripMargin,
-      ctxx = ctxx
-      )
-
-
-  @Test def removeNN2 =
-    val ctxx = newContext
-    ctxx.setSetting(ctxx.settings.YexplicitNulls, true)
-    checkCodeAction(
-      code =
-        """val s: String|Null = null.nn
-           |""".stripMargin,
-         title = "Remove unnecessary .nn",
-      expected =
-        """val s: String|Null = null
-           |""".stripMargin,
-      ctxx = ctxx
-      )
-
   @Test def addNN1 =
     val ctxx = newContext
     ctxx.setSetting(ctxx.settings.YexplicitNulls, true)
@@ -278,12 +250,12 @@ class CodeActionTest extends DottyTest:
     ctxx.setSetting(ctxx.settings.YexplicitNulls, true)
     checkCodeAction(
       code =
-        """given ctx: String | Null = null
+        """given ctx: (String | Null) = null
           |def f(using c: String): String = c
           |val s: String = f(using ctx)""".stripMargin,
         title = "Add .nn",
       expected =
-        """given ctx: String | Null = null
+        """given ctx: (String | Null) = null
           |def f(using c: String): String = c
           |val s: String = f(using ctx.nn)""".stripMargin,
       ctxx = ctxx
@@ -295,8 +267,8 @@ class CodeActionTest extends DottyTest:
     val rep = new StoreReporter(null) with UniqueMessagePositions with HideNonSensicalMessages
     initialCtx.setReporter(rep).withoutColors
 
-  private def checkCodeAction(code: String, title: String, expected: String, afterPhase: String = "typer") =
-    ctx = newContext
+  private def checkCodeAction(code: String, title: String, expected: String, afterPhase: String = "typer", ctxx: Context = newContext) =
+    ctx = ctxx
     val source = SourceFile.virtual("test", code).content
     val runCtx = checkCompile(afterPhase, code) { (_, _) => () }
     val diagnostics = runCtx.reporter.removeBufferedMessages

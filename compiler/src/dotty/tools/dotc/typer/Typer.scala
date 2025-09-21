@@ -53,6 +53,7 @@ import config.Config
 import transform.CheckUnused.OriginalName
 
 import scala.annotation.constructorOnly
+import scala.util.chaining.scalaUtilChainingOps
 import dotty.tools.dotc.rewrites.Rewrites
 
 object Typer {

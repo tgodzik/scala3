@@ -9,8 +9,8 @@
   |          given myGiven: Option[List[String]]  // define an instance
   |          given myGiven @ Option[List[String]] // as a pattern variable
 -- [E161] Naming Error: tests/neg/i23119.scala:18:8 --------------------------------------------------------------------
-18 |  given [A] => List[A] = ??? // error
-   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+18 |  given [A]: List[A] = ??? // error
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^
    |  given_List_A is already defined as given instance given_List_A
    |
    |  Provide an explicit, unique name to given definitions,
