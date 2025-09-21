@@ -53,6 +53,8 @@ object desugar {
    */
   val ForArtifact: Property.Key[Unit] = Property.StickyKey()
 
+  val WasTypedInfix: Property.Key[Unit] = Property.StickyKey()
+
   /** What static check should be applied to a Match? */
   enum MatchCheck {
     case None, Exhaustive, IrrefutablePatDef, IrrefutableGenFrom
@@ -1369,10 +1371,12 @@ object desugar {
         case _ =>
           Apply(sel, arg :: Nil)
 
-    if op.name.isRightAssocOperatorName then
+    val apply = if op.name.isRightAssocOperatorName then
       makeOp(right, left, Span(op.span.start, right.span.end))
     else
       makeOp(left, right, Span(left.span.start, op.span.end, op.span.start))
+    apply.pushAttachment(WasTypedInfix, ())
+    return apply
   }
 
   /** Translate throws type `A throws E1 | ... | En` to
