@@ -413,7 +413,10 @@ object Build {
     "scala2-library-tasty"
   )
 
-  val enableBspAllProjects = sys.env.get("ENABLE_BSP_ALL_PROJECTS").map(_.toBoolean).getOrElse(false)
+  val enableBspAllProjects = sys.env.get("ENABLE_BSP_ALL_PROJECTS").map(_.toBoolean).getOrElse{
+    val enableBspAllProjectsFile = file(".enable_bsp_all_projects")
+    enableBspAllProjectsFile.exists()
+  }
 
   // Settings used when compiling dotty with a non-bootstrapped dotty
   lazy val commonBootstrappedSettings = commonDottySettings ++ Seq(
