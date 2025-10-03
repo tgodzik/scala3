@@ -1,4 +1,5 @@
-package dotty.tools.dotc.transform
+package dotty.tools.dotc
+package transform
 
 import dotty.tools.dotc.ast.desugar.{ForArtifact, PatternVar}
 import dotty.tools.dotc.ast.tpd.*
@@ -60,14 +61,14 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
       val resolving =
            tree.srcPos.isUserCode
         || tree.srcPos.isZeroExtentSynthetic // take as summonInline
-      if resolving && !ignoreTree(tree) then
+      if !ignoreTree(tree) then
         def loopOverPrefixes(prefix: Type, depth: Int): Unit =
           if depth < 10 && prefix.exists && !prefix.classSymbol.isEffectiveRoot then
-            resolveUsage(prefix.classSymbol, nme.NO_NAME, NoPrefix)
+            resolveUsage(prefix.classSymbol, nme.NO_NAME, NoPrefix, imports = resolving)
             loopOverPrefixes(prefix.normalizedPrefix, depth + 1)
         if tree.srcPos.isZeroExtentSynthetic then
           loopOverPrefixes(tree.typeOpt.normalizedPrefix, depth = 0)
-        resolveUsage(tree.symbol, tree.name, tree.typeOpt.importPrefix.skipPackageObject)
+        resolveUsage(tree.symbol, tree.name, tree.typeOpt.importPrefix.skipPackageObject, imports = resolving)
     else if tree.hasType then
       resolveUsage(tree.tpe.classSymbol, tree.name, tree.tpe.importPrefix.skipPackageObject)
     refInfos.isAssignment = false
@@ -286,8 +287,11 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
    *  e.g., in `scala.Int`, `scala` is in scope for typer, but here we reverse-engineer the attribution.
    *  For Select, lint does not look up `<empty>.scala` (so top-level syms look like magic) but records `scala.Int`.
    *  For Ident, look-up finds the root import as usual. A competing import is OK because higher precedence.
+   *
+   *  The `imports` flag is whether an identifier can mark an import as used: the flag is false
+   *  for inlined code, except for `summonInline` (and related constructs) which are resolved at inlining.
    */
-  def resolveUsage(sym0: Symbol, name: Name, prefix: Type)(using Context): Unit =
+  def resolveUsage(sym0: Symbol, name: Name, prefix: Type, imports: Boolean = true)(using Context): Unit =
     import PrecedenceLevels.*
     val sym = sym0.userSymbol
 
@@ -391,7 +395,7 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
     // record usage and possibly an import
     if !enclosed then
       refInfos.addRef(sym)
-    if candidate != NoContext && candidate.isImportContext && importer != null then
+    if imports && candidate != NoContext && candidate.isImportContext && importer != null then
       refInfos.sels.put(importer, ())
   end resolveUsage
 
