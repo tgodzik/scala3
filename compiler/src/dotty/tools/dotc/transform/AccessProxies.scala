@@ -127,7 +127,6 @@ abstract class AccessProxies {
       *  access with a reference to the accessor.
       *
       *  @param reference    The original reference to the non-public symbol
-      *  @param onLHS        The reference is on the left-hand side of an assignment
       */
     def useAccessor(reference: RefTree)(using Context): Tree = {
       val accessed = reference.symbol.asTerm
