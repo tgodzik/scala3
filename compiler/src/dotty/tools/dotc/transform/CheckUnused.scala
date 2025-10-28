@@ -6,6 +6,7 @@ import dotty.tools.dotc.ast.tpd.*
 import dotty.tools.dotc.ast.untpd, untpd.ImportSelector
 import dotty.tools.dotc.config.ScalaSettings
 import dotty.tools.dotc.core.Contexts.*
+import dotty.tools.dotc.core.Decorators.*
 import dotty.tools.dotc.core.Flags.*
 import dotty.tools.dotc.core.Names.{Name, SimpleName, DerivedName, TermName, termName}
 import dotty.tools.dotc.core.NameKinds.{
@@ -169,12 +170,12 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
     tree
 
   override def prepareForBind(tree: Bind)(using Context): Context =
-    refInfos.register(tree)
+    register(tree)
     ctx
 
   override def prepareForValDef(tree: ValDef)(using Context): Context =
     if !tree.symbol.is(Deferred) && tree.rhs.symbol != defn.Predef_undefined then
-      refInfos.register(tree)
+      register(tree)
     relax(tree.rhs, tree.tpt.tpe)
     ctx
   override def transformValDef(tree: ValDef)(using Context): tree.type =
@@ -196,7 +197,7 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
     if tree.symbol.is(Inline) then
       refInfos.inliners += 1
     else if !tree.symbol.is(Deferred) && tree.rhs.symbol != defn.Predef_undefined then
-      refInfos.register(tree)
+      register(tree)
     relax(tree.rhs, tree.tpt.tpe)
     ctx
   override def transformDefDef(tree: DefDef)(using Context): tree.type =
@@ -208,7 +209,7 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
   override def transformTypeDef(tree: TypeDef)(using Context): tree.type =
     traverseAnnotations(tree.symbol)
     if !tree.symbol.is(Param) then // type parameter to do?
-      refInfos.register(tree)
+      register(tree)
     tree
 
   override def prepareForStats(trees: List[Tree])(using Context): Context =
@@ -224,8 +225,7 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
   override def transformOther(tree: Tree)(using Context): tree.type =
     tree match
     case imp: Import =>
-      if phaseMode eq PhaseMode.Aggregate then
-        refInfos.register(imp)
+      register(imp)
       transformAllDeep(imp.expr)
       for selector <- imp.selectors do
         if selector.isGiven then
@@ -375,7 +375,7 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
     while !done && ctxs.hasNext do
       val cur = ctxs.next()
       if cur.owner.userSymbol == sym && !sym.is(Package) then
-        enclosed = true // found enclosing definition, don't register the reference
+        enclosed = true // found enclosing definition, don't record the reference
       if isLocal then
         if cur.owner eq sym.owner then
           done = true // for local def, just checking that it is not enclosing
@@ -447,6 +447,12 @@ class CheckUnused private (phaseMode: PhaseMode, suffix: String) extends MiniPha
         return
       case _ =>
   end resolveScoped
+
+  /** Register new element for warnings only at typer */
+  def register(tree: Tree)(using Context): Unit =
+    if phaseMode eq PhaseMode.Aggregate then
+      refInfos.register(tree)
+
 end CheckUnused
 
 object CheckUnused:
