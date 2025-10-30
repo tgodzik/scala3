@@ -177,6 +177,7 @@ private sealed trait WarningSettings:
   private val WtoStringInterpolated = BooleanSetting("-Wtostring-interpolated", "Warn a standard interpolator used toString on a reference type.")
   private val WrecurseWithDefault = BooleanSetting("-Wrecurse-with-default", "Warn when a method calls itself with a default argument.")
   private val WwrongArrow = BooleanSetting("-Wwrong-arrow", "Warn if function arrow was used instead of context literal ?=>.")
+  private val WinferUnion = BooleanSetting("-Winfer-union", "Warn if type argument was inferred as union type.")
   private val Wunused: Setting[List[ChoiceWithHelp[String]]] = MultiChoiceHelpSetting(
     name = "-Wunused",
     helpArg = "warning",
@@ -291,6 +292,7 @@ private sealed trait WarningSettings:
     def recurseWithDefault(using Context): Boolean = allOr(WrecurseWithDefault)
     def checkInit(using Context): Boolean = allOr(YcheckInit)
     def wrongArrow(using Context): Boolean = allOr(WwrongArrow)
+    def inferUnion(using Context): Boolean = allOr(WinferUnion)
 
 /** -X "Extended" or "Advanced" settings */
 private sealed trait XSettings:
