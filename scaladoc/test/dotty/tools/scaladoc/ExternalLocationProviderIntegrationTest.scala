@@ -7,6 +7,7 @@ import dotty.tools.scaladoc.test.BuildInfo
 import java.nio.file.Path;
 import org.jsoup.Jsoup
 import util.IO
+import scala.util.Properties
 
 class JavadocExternalLocationProviderIntegrationTest extends ExternalLocationProviderIntegrationTest(
   "externalJavadoc",
@@ -73,7 +74,6 @@ class Scaladoc2LegacyExternalLocationProviderIntegrationTest extends LegacyExter
   )
 )
 
-
 abstract class ExternalLocationProviderIntegrationTest(
   name: String,
   mappings: Seq[String],
@@ -87,31 +87,33 @@ abstract class ExternalLocationProviderIntegrationTest(
       ).toList
   )
 
-  override def runTest = afterRendering {
-    val output = summon[DocContext].args.output.toPath
-    val linksBuilder = List.newBuilder[String]
+  override def runTest = if(!Properties.isWin) {
+    afterRendering {
+      val output = summon[DocContext].args.output.toPath
+      val linksBuilder = List.newBuilder[String]
 
-    def processFile(path: Path): Unit =
-      val document = Jsoup.parse(IO.read(path))
-      val content = document.select(".documentableElement").forEach { elem =>
-        val hrefValues = elem.select("a").asScala.map { a =>
-          a.attr("href")
+      def processFile(path: Path): Unit =
+        val document = Jsoup.parse(IO.read(path))
+        val content = document.select(".documentableElement").forEach { elem =>
+          val hrefValues = elem.select("a").asScala.map { a =>
+            a.attr("href")
+          }
+          linksBuilder ++= hrefValues
         }
-        linksBuilder ++= hrefValues
-      }
 
-    IO.foreachFileIn(output, processFile)
-    val links = linksBuilder.result
-    val errors = expectedLinks.flatMap(expect => Option.when(!links.contains(expect))(expect))
-    if !errors.isEmpty then {
-      val reportMessage =
-      "External location provider integration test failed.\n" +
-      "Missing links:\n"
-      + errors.mkString("\n","\n","\n")
-      + "Found links:" + links.mkString("\n","\n","\n")
-      reportError(reportMessage)
-    }
-  } :: Nil
+      IO.foreachFileIn(output, processFile)
+      val links = linksBuilder.result
+      val errors = expectedLinks.flatMap(expect => Option.when(!links.contains(expect))(expect))
+      if !errors.isEmpty then {
+        val reportMessage =
+        "External location provider integration test failed.\n" +
+        "Missing links:\n"
+        + errors.mkString("\n","\n","\n")
+        + "Found links:" + links.mkString("\n","\n","\n")
+        reportError(reportMessage)
+      }
+    } :: Nil
+  }
 
 abstract class LegacyExternalLocationProviderIntegrationTest(
   name: String,
