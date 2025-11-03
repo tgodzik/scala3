@@ -79,7 +79,7 @@ class VulpixUnitTests:
     compileFile("tests/vulpix-tests/unit/deadlock.scala", defaultOptions).expectFailure.checkRuns()
 
   @test def badJava: Unit =
-    assertThrows[AssertionError](_.getMessage.contains("java compilation failed")):
+    assertThrows[AssertionError](_.getMessage.nn.contains("java compilation failed")):
       compileFile("tests/vulpix-tests/unit/BadJava.java", defaultOptions)
         .suppressAllOutput
         .checkCompile()
@@ -87,7 +87,7 @@ class VulpixUnitTests:
   @test def runTimeout: Unit =
     val fileName = s"tests/vulpix-tests/unit/timeout.scala"
     val expect = """(?m).*test '.+' timed out.*"""
-    assertThrows[AssertionError](_.getMessage.linesIterator.toList.last.matches(expect)):
+    assertThrows[AssertionError](_.getMessage.nn.linesIterator.toList.last.matches(expect)):
       compileFile(fileName, defaultOptions)
         .suppressAllOutput
         .checkRuns()
