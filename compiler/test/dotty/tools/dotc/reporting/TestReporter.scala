@@ -36,7 +36,7 @@ extends Reporter with UniqueMessagePositions with HideNonSensicalMessages with M
   final def messages: Iterator[String] = _messageBuf.iterator
 
   protected final val _consoleBuf = new StringWriter
-  protected final val _consoleReporter = new ConsoleReporter(null, new PrintWriter(_consoleBuf)):
+  protected final val _consoleReporter = new ConsoleReporter(scala.Console.in, new PrintWriter(_consoleBuf)):
     override protected def renderPath(file: AbstractFile): String = TestReporter.renderPath(file)
 
   final def consoleOutput: String = _consoleBuf.toString
@@ -123,7 +123,7 @@ object TestReporter {
 
   def logPath: String = {
     initLog()
-    outFile.getCanonicalPath
+    outFile.getCanonicalPath.nn
   }
 
   def reporter(ps: PrintStream, logLevel: Int): TestReporter =
@@ -160,7 +160,7 @@ object TestReporter {
       Properties.rerunFailed &&
         failedTestsFile.exists() &&
         failedTestsFile.isFile
-    )(readAllLines(failedTestsFile.toPath).asScala.toList)
+    )(readAllLines(failedTestsFile.toPath).nn.asScala.toList)
 
   def writeFailedTests(tests: List[String]): Unit =
     initLog()
@@ -169,7 +169,7 @@ object TestReporter {
 
   def renderPath(file: AbstractFile): String =
     if JFile.separatorChar == '\\' then
-      file.path.replace('\\', '/')
+      file.path.replace('\\', '/').nn
     else
       file.path
 }
