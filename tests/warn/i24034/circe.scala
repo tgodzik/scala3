@@ -49,11 +49,11 @@ object ConfiguredCodec:
       q: Quotes
   ): Expr[ConfiguredCodec[A]] = {
     mirror match {
-      case '{
-            ${ _ }: Mirror.ProductOf[A] {
-              type MirroredLabel = l
-              type MirroredElemLabels = el
-              type MirroredElemTypes = et
+      case '{ // LTS specific warnings
+            ${ _ }: Mirror.ProductOf[A] { // warn
+              type MirroredLabel = l // warn
+              type MirroredElemLabels = el // warn
+              type MirroredElemTypes = et // warn
             }
           } =>
         '{
