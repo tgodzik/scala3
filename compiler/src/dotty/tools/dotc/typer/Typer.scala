@@ -1407,11 +1407,15 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
         case defn.ErasedFunctionOf(mt @ MethodTpe(_, formals, restpe)) if formals.length == defaultArity =>
           (formals, untpd.DependentTypeTree(syms => restpe.substParams(mt, syms.map(_.termRef))))
         case SAMType(mt @ MethodTpe(_, formals, restpe), _) =>
-          (formals,
-           if (mt.isResultDependent)
-             untpd.DependentTypeTree(syms => restpe.substParams(mt, syms.map(_.termRef)))
-           else
-             typeTree(restpe))
+          val tree =
+            if (mt.isResultDependent) {
+              if (formals.length != defaultArity)
+                typeTree(WildcardType)
+              else
+                untpd.DependentTypeTree(syms => restpe.substParams(mt, syms.map(_.termRef)))
+            } else
+              typeTree(restpe)
+          (formals, tree)
         case _ =>
           (List.tabulate(defaultArity)(alwaysWildcardType), untpd.TypeTree())
       }
