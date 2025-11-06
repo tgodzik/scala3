@@ -92,11 +92,13 @@ class Driver {
           case "help" =>
           case reporterClassName =>
             try
-              Class.forName(reporterClassName).getDeclaredConstructor().newInstance() match
-              case userReporter: Reporter =>
-                ictx.setReporter(userReporter)
-              case badReporter => report.error:
-                em"Not a reporter: ${ctx.settings.Yreporter.value}"
+              val newCls =  Class.forName(reporterClassName).nn
+              val newInst = newCls.getDeclaredConstructor().nn.newInstance().nn 
+              newInst match
+                case userReporter: Reporter =>
+                  ictx.setReporter(userReporter)
+                case badReporter => report.error:
+                  em"Not a reporter: ${ctx.settings.Yreporter.value}"
             catch case e: ReflectiveOperationException => report.error:
               em"Could not create reporter ${ctx.settings.Yreporter.value}: ${e}"
   }

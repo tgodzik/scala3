@@ -137,7 +137,7 @@ object Chars:
 
   def escapedChar(ch: Char): String =
     if requiresFormat(ch) then
-      val b = StringBuilder().append('\'')
+      val b = StringBuilder().append('\'').nn
       escapedChar(b, ch)
       b.append('\'').toString
     else
