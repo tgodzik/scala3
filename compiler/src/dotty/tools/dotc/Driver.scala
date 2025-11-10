@@ -10,6 +10,7 @@ import dotty.tools.io.AbstractFile
 import reporting.*
 import core.Decorators.*
 import config.Feature
+import util.chaining.*
 
 import scala.util.control.NonFatal
 import fromtasty.{TASTYCompiler, TastyFileUtil}
@@ -78,15 +79,26 @@ class Driver {
     MacroClassLoader.init(ictx)
     Positioned.init(using ictx)
 
-    inContext(ictx) {
+    inContext(ictx):
       if !ctx.settings.YdropComments.value || ctx.settings.YreadComments.value then
         ictx.setProperty(ContextDoc, new ContextDocstrings)
       val fileNamesOrNone = command.checkUsage(summary, sourcesRequired)(using ctx.settings)(using ctx.settingsState)
-      fileNamesOrNone.map { fileNames =>
+      fileNamesOrNone.map: fileNames =>
         val files = fileNames.map(ctx.getFile)
         (files, fromTastySetup(files))
-      }
-    }
+      .tap: _ =>
+        if !ctx.settings.Yreporter.isDefault then
+          ctx.settings.Yreporter.value match
+          case "help" =>
+          case reporterClassName =>
+            try
+              Class.forName(reporterClassName).getDeclaredConstructor().newInstance() match
+              case userReporter: Reporter =>
+                ictx.setReporter(userReporter)
+              case badReporter => report.error:
+                em"Not a reporter: ${ctx.settings.Yreporter.value}"
+            catch case e: ReflectiveOperationException => report.error:
+              em"Could not create reporter ${ctx.settings.Yreporter.value}: ${e}"
   }
 
   /** Setup extra classpath of tasty and jar files */

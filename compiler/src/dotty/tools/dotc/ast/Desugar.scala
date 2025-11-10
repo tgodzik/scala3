@@ -1024,25 +1024,27 @@ object desugar {
     else tree
   }
 
+  def checkSimplePackageName(name: Name, errSpan: Span, source: SourceFile, isPackageObject: Boolean)(using Context) =
+    if !ctx.isAfterTyper then
+      name match
+      case name: SimpleName if (isPackageObject || !errSpan.isSynthetic) && name.exists(Chars.willBeEncoded) =>
+        report.warning(EncodedPackageName(name), source.atSpan(errSpan))
+      case _ =>
+
   def checkPackageName(mdef: ModuleDef | PackageDef)(using Context): Unit =
-
-    def check(name: Name, errSpan: Span): Unit = name match
-      case name: SimpleName if !errSpan.isSynthetic && name.exists(Chars.willBeEncoded) =>
-        report.warning(em"The package name `$name` will be encoded on the classpath, and can lead to undefined behaviour.", mdef.source.atSpan(errSpan))
-      case _ =>
-
-    def loop(part: RefTree): Unit = part match
-      case part @ Ident(name) => check(name, part.span)
-      case part @ Select(qual: RefTree, name) =>
-        check(name, part.nameSpan)
-        loop(qual)
-      case _ =>
-
+    def check(name: Name, errSpan: Span) = checkSimplePackageName(name, errSpan, mdef.source, isPackageObject = false)
     mdef match
-      case pdef: PackageDef => loop(pdef.pid)
-      case mdef: ModuleDef if mdef.mods.is(Package) => check(mdef.name, mdef.nameSpan)
-      case _ =>
-  end checkPackageName
+    case pdef: PackageDef =>
+      def loop(part: RefTree): Unit = part match
+        case part @ Ident(name) => check(name, part.span)
+        case part @ Select(qual: RefTree, name) =>
+          check(name, part.nameSpan)
+          loop(qual)
+        case _ =>
+      loop(pdef.pid)
+    case mdef: ModuleDef if mdef.mods.is(Package) =>
+      check(mdef.name, mdef.nameSpan)
+    case _ =>
 
   /** The normalized name of `mdef`. This means
    *   1. Check that the name does not redefine a Scala core class.
