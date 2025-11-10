@@ -32,10 +32,11 @@ class DiagnosticProviderSuite extends PcAssertions {
     additionalChecks: List[Diagnostic] => Unit = identity
   ): Unit =
     val diagnostics = pc
-      .didChange(TestVirtualFileParams(URI.create("file:/Diagnostic.scala"), text))
+      .didChange(TestVirtualFileParams(URI.create("file:/Diagnostic.scala").nn, text))
+      .nn
       .asScala
 
-    val actual = diagnostics.map(d => TestDiagnostic(d.getRange().getStart().getOffset(text), d.getRange().getEnd().getOffset(text), d.getMessage(), d.getSeverity()))
+    val actual = diagnostics.map(d => TestDiagnostic(d.getRange().nn.getStart().nn.getOffset(text), d.getRange().nn.getEnd().nn.getOffset(text), d.getMessage().nn, d.getSeverity().nn))
     assertEquals(expected, actual, s"Expected [${expected.mkString(", ")}] but got [${actual.mkString(", ")}]")
     additionalChecks(diagnostics.toList)
 
@@ -77,8 +78,8 @@ class DiagnosticProviderSuite extends PcAssertions {
       ),
       diags =>
         val action = diags.head.getData().asInstanceOf[java.util.List[CodeAction]].asScala.head
-        assertWithDiff("Remove repeated modifier: \"private\"", action.getTitle(), false)
-        assertEquals(1, action.getEdit().getChanges().size(), "There should be one change")
+        assertWithDiff("Remove repeated modifier: \"private\"", action.getTitle().nn, false)
+        assertEquals(1, action.getEdit().nn.getChanges().nn.size(), "There should be one change")
     )
 
 }

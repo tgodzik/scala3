@@ -576,8 +576,8 @@ object Completion:
               termRef.denot.asSingleDenotation.mapInfo(_ => tpe)
             }
         catch case NonFatal(ex) =>
-          logger.warning(
-            s"Exception when trying to apply extension method:\n ${ex.getMessage()}\n${ex.getStackTrace().mkString("\n")}"
+          logger.nn.warning(
+            s"Exception when trying to apply extension method:\n ${ex.getMessage()}\n${ex.getStackTrace().nn.mkString("\n")}"
           )
           None
 
@@ -684,8 +684,8 @@ object Completion:
       interactiv.println(i"implicit conversion targets considered: ${conversions.toList}%, %")
       conversions
     } catch case NonFatal(ex) =>
-      logger.warning(
-        s"Exception when searching for implicit conversions:\n ${ex.getMessage()}\n${ex.getStackTrace().mkString("\n")}"
+      logger.nn.warning(
+        s"Exception when searching for implicit conversions:\n ${ex.getMessage()}\n${ex.getStackTrace().nn.mkString("\n")}"
       )
       Set.empty
 
