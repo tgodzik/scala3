@@ -669,7 +669,7 @@ object CheckUnused:
 
     def checkLocal(sym: Symbol, pos: SrcPos) =
       if ctx.settings.WunusedHas.locals
-        && !sym.is(InlineProxy)
+        && !sym.isOneOf(InlineProxy | Synthetic)
       then
         if sym.is(Mutable) && infos.asss(sym) then
           warnAt(pos)(UnusedSymbol.localVars)
