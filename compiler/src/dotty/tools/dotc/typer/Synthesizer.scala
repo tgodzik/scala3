@@ -28,7 +28,7 @@ class Synthesizer(typer: Typer)(using @constructorOnly c: Context):
   private type SpecialHandlers = List[(ClassSymbol, SpecialHandler)]
 
   val synthesizedClassTag: SpecialHandler = (formal, span) =>
-    def instArg(tp: Type): Type = tp.dealias match
+    def instArg(tp: Type): Type = tp.stripTypeVar match
       // Special case to avoid instantiating `Int & S` to `Int & Nothing` in
       // i16328.scala. The intersection comes from an earlier instantiation
       // to an upper bound.
@@ -36,35 +36,9 @@ class Synthesizer(typer: Typer)(using @constructorOnly c: Context):
       // bounds are usually widened during instantiation.
       case tp: AndOrType if tp.tp1 =:= tp.tp2 =>
         instArg(tp.tp1)
-      case tvar: TypeVar if ctx.typerState.constraint.contains(tvar) =>
-        // If tvar has a lower or upper bound:
-        //   1. If the bound is not another type variable, use this as approximation.
-        //   2. Otherwise, if the type can be forced to be fully defined, use that type
-        //      as approximation.
-        //   3. Otherwise leave argument uninstantiated.
-        // The reason for (2) is that we observed complicated constraints in i23611.scala
-        // that get better types if a fully defined type is computed than if several type
-        // variables are approximated incrementally. This is a minimization of some ZIO code.
-        // So in order to keep backwards compatibility (where before we _only_ did 2) we
-        // add that special case.
-        def isGroundConstr(tp: Type): Boolean = tp.dealias match
-          case tvar: TypeVar if ctx.typerState.constraint.contains(tvar) => false
-          case pref: TypeParamRef if ctx.typerState.constraint.contains(pref) => false
-          case tp: AndOrType => isGroundConstr(tp.tp1) && isGroundConstr(tp.tp2)
-          case _ => true
-        instArg(
-            if tvar.hasLowerBound then
-              if isGroundConstr(fullLowerBound(tvar.origin)) then tvar.instantiate(fromBelow = true)
-              else if isFullyDefined(tp, ForceDegree.all) then tp
-              else NoType
-            else if tvar.hasUpperBound then
-              if isGroundConstr(fullUpperBound(tvar.origin)) then tvar.instantiate(fromBelow = false)
-              else if isFullyDefined(tp, ForceDegree.all) then tp
-              else NoType
-            else
-              NoType)
       case _ =>
-        tp
+        if isFullyDefined(tp, ForceDegree.all) then tp
+        else NoType // this happens in tests/neg/i15372.scala
 
     val tag = formal.argInfos match
       case arg :: Nil =>
