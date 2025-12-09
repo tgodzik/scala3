@@ -161,7 +161,7 @@ object Build {
   val stdlibBootstrappedVersion = "2.13.16"
 
   val homepageUrl = "https://scala-lang.org/"
-  val dottyOrganization = "org.scala-lang"
+  val dottyOrganization = "io.github.tgodzik"
   val dottyGithubUrl = "https://github.com/scala/scala3"
   val dottyGithubRawUserContentUrl = "https://raw.githubusercontent.com/scala/scala3"
 
