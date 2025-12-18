@@ -454,7 +454,9 @@ trait UntypedTreeInfo extends TreeInfo[Untyped] { self: Trees.Instance[Untyped] 
    */
   private def defKind(tree: Tree)(using Context): FlagSet = unsplice(tree) match {
     case EmptyTree | _: Import => NoInitsInterface
-    case tree: TypeDef => if (tree.isClassDef) NoInits else NoInitsInterface
+    case tree: TypeDef =>
+      if tree.isClassDef then NoInits
+      else NoInitsInterface
     case tree: DefDef =>
       if tree.unforcedRhs == EmptyTree
          && tree.paramss.forall {
@@ -463,8 +465,6 @@ trait UntypedTreeInfo extends TreeInfo[Untyped] { self: Trees.Instance[Untyped] 
             }
       then
         NoInitsInterface
-      else if tree.mods.is(Given) && tree.paramss.isEmpty then
-        EmptyFlags // might become a lazy val: TODO: check whether we need to suppress NoInits once we have new lazy val impl
       else
         NoInits
     case tree: ValDef => if (tree.unforcedRhs == EmptyTree) NoInitsInterface else EmptyFlags
