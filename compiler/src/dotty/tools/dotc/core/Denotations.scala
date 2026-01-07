@@ -476,9 +476,14 @@ object Denotations {
           val relaxedOverriding = ctx.explicitNulls && (sym1.is(JavaDefined) || sym2.is(JavaDefined))
           val matchLoosely = sym1.matchNullaryLoosely || sym2.matchNullaryLoosely
 
-          if symScore <= 0 && info2.overrides(info1, relaxedOverriding, matchLoosely, checkClassInfo = false) then
+          val compareCtx =
+            if sym1.is(JavaDefined) && sym2.is(JavaDefined) then
+              ctx.withProperty(TypeComparer.ComparingJavaMethods, Some(()))
+            else ctx
+
+          if symScore <= 0 && info2.overrides(info1, relaxedOverriding, matchLoosely, checkClassInfo = false) (using compareCtx) then
             denot2
-          else if symScore >= 0 && info1.overrides(info2, relaxedOverriding, matchLoosely, checkClassInfo = false) then
+          else if symScore >= 0 && info1.overrides(info2, relaxedOverriding, matchLoosely, checkClassInfo = false)(using compareCtx) then
             denot1
           else
             val jointInfo = infoMeet(info1, info2, safeIntersection)
