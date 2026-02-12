@@ -40,6 +40,7 @@ abstract class BasePCSuite extends PcAssertions:
   val testingWorkspaceSearch = TestingWorkspaceSearch(
     TestResources.classpath.map(_.toString)
   )
+  protected val sourcePath: Seq[Path] = Nil
 
   lazy val presentationCompiler: PresentationCompiler =
     val myclasspath: Seq[Path] = TestResources.classpath ++ additionalClasspath
@@ -56,7 +57,7 @@ abstract class BasePCSuite extends PcAssertions:
       .withScheduledExecutorService(executorService)
       .withSearch(search)
       .withCompletionItemPriority(completionItemPriority)
-      .newInstance("", myclasspath.asJava, scalacOpts.asJava)
+      .newInstance("", myclasspath.asJava, scalacOpts.asJava, () => sourcePath.asJava)
 
   protected def config: PresentationCompilerConfigImpl =
     PresentationCompilerConfigImpl().copy(snippetAutoIndent = false, timeoutDelay = if isDebug then 3600 else 10)
