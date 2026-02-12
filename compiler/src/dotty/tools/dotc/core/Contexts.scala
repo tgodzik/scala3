@@ -918,7 +918,7 @@ object Contexts {
     }
 
     protected def newPlatform(using Context): Platform =
-      if (settings.scalajs.value) new SJSPlatform
+      if settings.scalajs.value then new SJSPlatform
       else new JavaPlatform
 
     /** The loader that loads the members of _root_ */

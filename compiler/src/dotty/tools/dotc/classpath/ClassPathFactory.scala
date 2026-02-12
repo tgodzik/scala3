@@ -8,6 +8,9 @@ import FileUtils.*
 import dotty.tools.io.ClassPath
 import dotty.tools.dotc.core.Contexts.*
 import java.nio.file.Files
+import dotty.tools.dotc.interactive.LogicalSourcePath
+import dotty.tools.dotc.interactive.LogicalPackagesProvider
+import dotty.tools.dotc.interactive.LogicalPackage
 
 /**
  * Provides factory methods for classpath. When creating classpath instances for a given path,
@@ -78,10 +81,13 @@ class ClassPathFactory {
 
   end classesInPathImpl
 
-  private def createSourcePath(file: AbstractFile)(using Context): ClassPath =
-    if (file.isJarOrZip)
+  private def createSourcePath(file: AbstractFile)(using ctx: Context): ClassPath =
+    if file.isJarOrZip then
       ZipAndJarSourcePathFactory.create(file)
-    else if (file.isDirectory)
+    else if file.isDirectory && ctx.settings.sourcepath.value.nonEmpty && ctx.settings.YlogicalPackageLoading.value then
+      val rootPackage: LogicalPackage = new LogicalPackagesProvider(ctx.settings.sourcepath.value).root
+      new LogicalSourcePath(ctx.settings.sourcepath.value, rootPackage)
+    else if file.isDirectory then
       new DirectorySourcePath(file.file.nn)
     else
       sys.error(s"Unsupported sourcepath element: $file")
