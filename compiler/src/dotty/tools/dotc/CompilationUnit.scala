@@ -75,6 +75,9 @@ class CompilationUnit protected (val source: SourceFile, val info: CompilationUn
   /** Will be set to true if the unit contains a pureFunctions language import */
   var knowsPureFuns: Boolean = false
 
+  /** Will be set to true if the source was loaded from sourcepath (not regular sources) */
+  var isFromSourcePath: Boolean = false
+
   var suspended: Boolean = false
   var suspendedAtInliningPhase: Boolean = false
 
@@ -165,6 +168,23 @@ object CompilationUnit {
     new CompilationUnit(src, null)
   }
 
+  /** Check if a source file is located within any of the sourcepath directories */
+  private def isFromSourcepathDir(source: SourceFile)(using Context): Boolean =
+    val settings = ctx.settings
+    if settings.sourcepath.value.isEmpty then
+      false
+    else
+      try
+        val sourcepathDirs = settings.sourcepath.value
+          .split(java.io.File.pathSeparator)
+          .filter(_.nonEmpty)
+          .map(d => java.nio.file.Paths.get(d).toAbsolutePath.normalize)
+
+        val sourcePath = java.nio.file.Paths.get(source.file.path).toAbsolutePath.normalize
+        sourcepathDirs.exists(spDir => sourcePath.startsWith(spDir))
+      catch
+        case _: Exception => false
+
   /** Create a compilation unit corresponding to `source`.
    *  If `mustExist` is true, this will fail if `source` does not exist.
    */
@@ -182,7 +202,11 @@ object CompilationUnit {
       }
       else source
     val info = if src.exists then CompilationUnitInfo(src.file) else null
-    new CompilationUnit(src, info)
+    val unit = new CompilationUnit(src, info)
+    // Mark if this source is from sourcepath
+    if src.exists && isFromSourcepathDir(src) then
+      unit.isFromSourcePath = true
+    unit
   }
 
   /** Force the tree to be loaded */

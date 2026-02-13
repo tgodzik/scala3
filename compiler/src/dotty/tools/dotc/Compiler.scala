@@ -34,6 +34,7 @@ class Compiler {
   protected def frontendPhases: List[List[Phase]] =
     List(new Parser) ::             // Compiler frontend: scanner, parser
     List(new TyperPhase) ::         // Compiler frontend: namer, typer
+    List(new PruneSourcePath) ::    // Prune method bodies from sourcepath sources
     List(new WInferUnion,           // Check for type arguments inferred as union types
          CheckUnused.PostTyper(),   // Check for unused
          CheckShadowing()) ::       // Check for shadowed elements

@@ -15,6 +15,7 @@ class InteractiveCompiler extends Compiler {
   override def phases: List[List[Phase]] = List(
     List(new Parser),
     List(new TyperPhase),
+    List(new transform.PruneSourcePath),
     List(new transform.SetRootTree),
     List(new transform.CookComments)
   )
