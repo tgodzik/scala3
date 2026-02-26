@@ -39,6 +39,5 @@ class SemanticdbTextDocumentProvider(
       .getOrElse(filePath.toString())
 
     semanticdb.textDocumentBytes(tree, path.nn, sourceCode)(using driver.currentCtx)
-  end textDocument
 
 end SemanticdbTextDocumentProvider
