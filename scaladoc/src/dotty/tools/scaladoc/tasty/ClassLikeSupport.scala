@@ -115,7 +115,7 @@ trait ClassLikeSupport:
       getSupertypesGraph(LinkToType(selfSignature, classDef.symbol.dri, bareClasslikeKind(classDef.symbol)), unpackTreeToClassDef(classDef).parents)
     )
 
-    val kind = if intrinsicClassDefs.contains(classDef.symbol) then Kind.Class(Nil, Nil) else kindForClasslike(classDef)
+    val kind = if intrinsicClassDefs.contains(classDef.symbol) then bareClasslikeKind(classDef.symbol) else kindForClasslike(classDef)
 
     val baseMember = mkMember(classDef.symbol, kind, selfSignature)(
       modifiers = modifiers,
