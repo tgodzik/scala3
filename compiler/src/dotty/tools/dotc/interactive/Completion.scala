@@ -17,6 +17,7 @@ import dotty.tools.dotc.core.Symbols.{NoSymbol, Symbol, defn, newSymbol}
 import dotty.tools.dotc.core.StdNames.nme
 import dotty.tools.dotc.core.SymDenotations.SymDenotation
 import dotty.tools.dotc.core.TypeError
+import dotty.tools.dotc.core.CyclicReference
 import dotty.tools.dotc.core.Phases
 import dotty.tools.dotc.core.Types.{AppliedType, ExprType, MethodOrPoly, NameFilter, NoType, RefinedType, TermRef, Type, TypeProxy}
 import dotty.tools.dotc.parsing.Tokens
@@ -319,8 +320,10 @@ object Completion:
       Completion(name.show, description(denot), List(denot.symbol))
 
   def description(denot: SingleDenotation)(using Context): String =
-    if denot.isType then denot.symbol.showFullName
-    else denot.info.widenTermRefExpr.show
+    try
+      if denot.isType then denot.symbol.showFullName
+      else denot.info.widenTermRefExpr.show
+    catch case _: CyclicReference => denot.symbol.name.toString
 
   def isInNewContext(untpdPath: List[untpd.Tree]): Boolean =
     untpdPath match
