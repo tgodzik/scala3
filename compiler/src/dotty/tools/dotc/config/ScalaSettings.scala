@@ -427,6 +427,7 @@ private sealed trait YSettings:
   val YstopAfter: Setting[List[String]] = PhasesSetting(ForkSetting, "Ystop-after", "Stop after", aliases = List("-stop")) // backward compat
   val YstopBefore: Setting[List[String]] = PhasesSetting(ForkSetting, "Ystop-before", "Stop before") // stop before erasure as long as we have not debugged it fully
   val YshowSuppressedErrors: Setting[Boolean] = BooleanSetting(ForkSetting, "Yshow-suppressed-errors", "Also show follow-on errors and warnings that are normally suppressed.")
+  val YlogicalPackageLoading: Setting[Boolean] = BooleanSetting(ForkSetting, "YlogicalPackageLoading", "Enable logical package loading. This will load the logical package structure by preparsing the source files to discover the package structure.")
   val YdetailedStats: Setting[Boolean] = BooleanSetting(ForkSetting, "Ydetailed-stats", "Show detailed internal compiler stats (needs Stats.enabled to be set to true).")
   val YprintPos: Setting[Boolean] = BooleanSetting(ForkSetting, "Yprint-pos", "Show tree positions.")
   val YprintPosSyms: Setting[Boolean] = BooleanSetting(ForkSetting, "Yprint-pos-syms", "Show symbol definitions positions.")
