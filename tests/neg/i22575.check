@@ -1,4 +1,9 @@
 -- Error: tests/neg/i22575.scala:11:21 ---------------------------------------------------------------------------------
 11 |  requireConst(transp(nonTranspDouble)) // error
    |               ^^^^^^^^^^^^^^^^^^^^^^^
-   |               expected a constant value but found: (x: Int) => (x * 2):(Int => Int).apply(2)
+   |               expected a constant value but found: (
+   |                 {
+   |                   def $anonfun(x: Int): Int = x.*(2)
+   |                   closure($anonfun)
+   |                 }
+   |               :(Int => Int)).apply(2)
