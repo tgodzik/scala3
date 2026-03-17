@@ -4695,11 +4695,15 @@ class Typer(@constructorOnly nestingLevel: Int = 0) extends Namer
 
   // Check if the tree was ascribed to `Unit` explicitly to silence the warning.
   private def withDiscardWarnable(tree: tpd.Tree)(op: (tpd.Tree) => Unit)(using Context): Unit =
-    val warnable = tree match
-      case inlined: Inlined => inlined.expansion
-      case tree => tree
-    if !isThisTypeResult(warnable) && !isAscribedToUnit(warnable) then
-      op(warnable)
+    def exempt(tree: tpd.Tree): Boolean = isThisTypeResult(tree) || isAscribedToUnit(tree)
+    def recur(tree: tpd.Tree): Unit = tree match
+      case tree: Inlined =>
+        if !exempt(tree.call) then
+          recur(tree.expansion)
+      case tree =>
+        if !exempt(tree) then
+          op(tree)
+    recur(tree)
 
   /** Types the body Scala 2 macro declaration `def f = macro <body>` */
   protected def typedScala2MacroBody(call: untpd.Tree)(using Context): Tree =
