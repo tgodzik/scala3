@@ -52,5 +52,5 @@ class PcSemanticdbSuite extends BasePCSuite:
   ): Unit =
     val uri = new URI(s"file:///$filename")
     val doc = presentationCompiler.semanticdbTextDocument(uri, original)
-    val obtained = DocumentPrinter.textDocumentPrettyPrint(doc.get())
+    val obtained = DocumentPrinter.textDocumentPrettyPrint(doc.nn.get().nn)
     assertNoDiff(expected, obtained)
