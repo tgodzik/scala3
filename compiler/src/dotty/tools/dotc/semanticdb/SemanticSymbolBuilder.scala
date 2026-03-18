@@ -264,11 +264,11 @@ private[semanticdb] object SemanticSymbolBuilder:
         addName(b, sym.name)
         if sym.is(Package) then b.append('/')
         else if sym.isType || sym.isAllOf(JavaModule) then b.append('#')
-        else if sym.is(Method) || (sym.is(Mutable) && !sym.is(JavaDefined))
+        else if (isScalaMethodOrVar || isJavaMethod)
           && (!sym.is(StableRealizable) || sym.isConstructor) then
-          b.append('(')
-          addOverloadIdx(sym)
-          b.append(").")
+            b.append('(')
+            addOverloadIdx(sym)
+            b.append(").")
         else b.append('.')
 
     sb match
