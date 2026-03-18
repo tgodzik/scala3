@@ -3,7 +3,11 @@ package dotty.tools.dotc.semanticdb
 import dotty.tools.dotc.semanticdb.Scala3.{*, given}
 import dotty.tools.dotc.util.SourceFile
 
-private[semanticdb] object DocumentPrinter:
+object DocumentPrinter:
+  /** Pretty-prints a SemanticDB `TextDocument` provided in its serialized form. Intended for testing and debugging. */
+  def textDocumentPrettyPrint(bytes: Array[Byte]): String =
+    DocumentPrinter.printTextDocument(TextDocument.parseFrom(bytes))
+  
   /** Pretty-prints a text document with symbol occurrences next to each resolved identifier.
    *
    * Useful for testing purposes to ensure that SymbolOccurrence values make sense and are correct.
@@ -14,7 +18,7 @@ private[semanticdb] object DocumentPrinter:
    *   }
    * }}}
    **/
-  def printTextDocument(doc: TextDocument): String =
+  private def printTextDocument(doc: TextDocument): String =
     val symtab = doc.symbols.iterator.map(info => info.symbol -> info).toMap
     val sb = StringBuilder(1000)
     val sourceFile = SourceFile.virtual(doc.uri, doc.text)
@@ -40,5 +44,3 @@ private[semanticdb] object DocumentPrinter:
     sb.append(doc.text.substring(offset))
     sb.toString
   end printTextDocument
-
-end DocumentPrinter

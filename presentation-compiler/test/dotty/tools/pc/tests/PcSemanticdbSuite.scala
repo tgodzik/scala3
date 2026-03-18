@@ -2,8 +2,7 @@ package dotty.tools.pc.tests
 
 import java.net.URI
 
-import dotty.tools.dotc.semanticdb.TextDocument
-import dotty.tools.dotc.semanticdb
+import dotty.tools.dotc.semanticdb.{DocumentPrinter, TextDocument}
 import dotty.tools.pc.base.BasePCSuite
 
 import org.junit.Test
@@ -53,5 +52,5 @@ class PcSemanticdbSuite extends BasePCSuite:
   ): Unit =
     val uri = new URI(s"file:///$filename")
     val doc = presentationCompiler.semanticdbTextDocument(uri, original)
-    val obtained = semanticdb.textDocumentPrettyPrint(doc.get())
+    val obtained = DocumentPrinter.textDocumentPrettyPrint(doc.get())
     assertNoDiff(expected, obtained)

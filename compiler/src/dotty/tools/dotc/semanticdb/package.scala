@@ -39,10 +39,6 @@ package object semanticdb {
     out.flush()
     byteStream.toByteArray.nn
 
-  /** Pretty-prints a SemanticDB `TextDocument` provided in its serialized form. Intended for testing and debugging. */
-  def textDocumentPrettyPrint(bytes: Array[Byte]): String =
-    DocumentPrinter.printTextDocument(TextDocument.parseFrom(bytes))
-
   /** Gets SemanticDB symbols from the given name. */
   def symbolsFromName(sym: String)(using ctx: Context): List[Symbol] =
     SemanticSymbolBuilder.inverseSymbol(sym)

@@ -156,6 +156,6 @@ object SemanticdbTests:
     val out = SemanticdbOutputStream.newInstance(byteStream)
     doc.writeTo(out)
     out.flush()
-    semanticdb.textDocumentPrettyPrint(byteStream.toByteArray.nn)
+    DocumentPrinter.textDocumentPrettyPrint(byteStream.toByteArray.nn)
   end printTextDocument
 end SemanticdbTests
