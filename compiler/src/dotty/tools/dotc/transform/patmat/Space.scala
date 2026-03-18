@@ -954,5 +954,7 @@ object SpaceEngine {
     }
 
   def checkMatchExhaustivityOnly(m: Match)(using Context): Unit =
-    if exhaustivityCheckable(m.selector) then checkExhaustivity(m)
+    inContext(ctx.withProperty(IsSubspaceCacheKey, Some(mutable.HashMap.empty))) {
+      if exhaustivityCheckable(m.selector) then checkExhaustivity(m)
+    }
 }

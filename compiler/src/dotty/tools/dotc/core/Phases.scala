@@ -330,7 +330,7 @@ object Phases {
     final def traversals: Int = if subPhases.isEmpty then 1 else subPhases.length
 
     /** @pre `isRunnable` returns true */
-    override protected def run(using Context): Unit
+    protected def run(using Context): Unit
 
     /** @pre `isRunnable` returns true */
     def runOn(units: List[CompilationUnit])(using runCtx: Context): List[CompilationUnit] =
