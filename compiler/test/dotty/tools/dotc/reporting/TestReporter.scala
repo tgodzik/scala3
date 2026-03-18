@@ -36,7 +36,7 @@ extends Reporter with UniqueMessagePositions with HideNonSensicalMessages with M
   final def messages: Iterator[String] = _messageBuf.iterator
 
   protected final val _consoleBuf = new StringWriter
-  protected final val _consoleReporter = new ConsoleReporter(scala.Console.in, new PrintWriter(_consoleBuf)):
+  protected final val _consoleReporter = new TestConsoleReporter(new PrintWriter(_consoleBuf)):
     override protected def renderPath(file: AbstractFile): String = TestReporter.renderPath(file)
 
   final def consoleOutput: String = _consoleBuf.toString
@@ -80,11 +80,22 @@ extends Reporter with UniqueMessagePositions with HideNonSensicalMessages with M
       case _ => ""
     }
 
-    if dia.level >= WARNING then
+    if _consoleReporter.isDiagnosticRelevant(dia) then
       _consoleReporter.doReport(dia)
       _diagnosticBuf.append(dia)
     printMessageAndPos(dia, extra)
   }
+}
+
+class TestConsoleReporter(writer: PrintWriter) extends ConsoleReporter(null, writer) {
+  // Report even info-level diagnostics if they've been explicitly enabled by -Ylog
+  def isDiagnosticRelevant(dia: Diagnostic)(using Context): Boolean =
+    dia.level >= WARNING || ctx.settings.Ylog.value.containsPhase(ctx.phase)
+
+  /** Print the message with the given position indication. */
+  override def doReport(dia: Diagnostic)(using Context): Unit =
+    if isDiagnosticRelevant(dia) then printMessage(messageAndPos(dia))
+    else echoMessage(messageAndPos(dia))
 }
 
 object TestReporter {
