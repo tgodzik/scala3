@@ -67,7 +67,7 @@ class GenBCode extends Phase { self =>
     _generatedClassHandler.nn
   }
 
-  override def run(using Context): Unit =
+  protected def run(using Context): Unit =
     frontendAccess.frontendSynchWithoutContext {
       backendInterface.ctx
       .asInstanceOf[FreshContext]

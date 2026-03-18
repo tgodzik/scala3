@@ -75,7 +75,7 @@ class Pickler extends Phase {
   private def useExecutor(using Context) =
     Pickler.ParallelPickling && !ctx.settings.YtestPickler.value
 
-  override def run(using Context): Unit = {
+  protected def run(using Context): Unit = {
     val unit = ctx.compilationUnit
     pickling.println(i"unpickling in run ${ctx.runId}")
 

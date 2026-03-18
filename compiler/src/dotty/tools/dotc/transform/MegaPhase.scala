@@ -132,7 +132,7 @@ object MegaPhase {
 
     protected def singletonGroup: MegaPhase = new MegaPhase(Array(this))
 
-    override def run(using Context): Unit =
+    protected def run(using Context): Unit =
       singletonGroup.run
   }
 }
@@ -482,7 +482,7 @@ class MegaPhase(val miniPhases: Array[MiniPhase]) extends Phase {
   def transformSpecificTrees[T <: Tree](trees: List[T], start: Int)(using Context): List[T] =
     transformTrees(trees, start).asInstanceOf[List[T]]
 
-  override def run(using Context): Unit =
+  protected def run(using Context): Unit =
     ctx.compilationUnit.tpdTree =
       atPhase(miniPhases.last.next)(transformUnit(ctx.compilationUnit.tpdTree))
 

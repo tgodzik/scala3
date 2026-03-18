@@ -66,7 +66,7 @@ class ExtractDependencies extends Phase {
   // See the scripted test `constants` for an example where this matters.
   // TODO: Add a `Phase#runsBefore` method ?
 
-  override def run(using Context): Unit = {
+  protected def run(using Context): Unit = {
     val unit = ctx.compilationUnit
     val collector = new ExtractDependenciesCollector
     collector.traverse(unit.tpdTree)

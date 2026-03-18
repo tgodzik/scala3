@@ -14,7 +14,7 @@ class GenSJSIR extends Phase {
   override def isEnabled(using Context): Boolean =
     ctx.settings.scalajs.value
 
-  def run(using Context): Unit =
+  override protected def run(using Context): Unit =
     new JSCodeGen().run()
 }
 
