@@ -61,7 +61,7 @@ class ExtractAPI extends Phase {
   // definitions, and `PostTyper` does not change definitions).
   override def runsAfter: Set[String] = Set(transform.PostTyper.name)
 
-  override def run(using Context): Unit = {
+  protected def run(using Context): Unit = {
     val unit = ctx.compilationUnit
     val sourceFile = unit.source
     ctx.withIncCallback: cb =>

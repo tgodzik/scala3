@@ -30,7 +30,7 @@ object Phases {
   @sharable object NoPhase extends Phase {
     override def exists: Boolean = false
     def phaseName: String = "<no phase>"
-    def run(using Context): Unit = unsupported("run")
+    protected def run(using Context): Unit = unsupported("run")
     def transform(ref: SingleDenotation)(using Context): SingleDenotation = unsupported("transform")
   }
 
@@ -42,13 +42,13 @@ object Phases {
 
     object SomePhase extends Phase {
       def phaseName: String = "<some phase>"
-      def run(using Context): Unit = unsupported("run")
+      protected def run(using Context): Unit = unsupported("run")
     }
 
     /** A sentinel transformer object */
     class TerminalPhase extends DenotTransformer {
       def phaseName: String = "terminal"
-      def run(using Context): Unit = unsupported("run")
+      protected def run(using Context): Unit = unsupported("run")
       def transform(ref: SingleDenotation)(using Context): SingleDenotation =
         unsupported("transform")
       override def lastPhaseId(using Context): Int = id
@@ -330,7 +330,7 @@ object Phases {
     final def traversals: Int = if subPhases.isEmpty then 1 else subPhases.length
 
     /** @pre `isRunnable` returns true */
-    def run(using Context): Unit
+    override protected def run(using Context): Unit
 
     /** @pre `isRunnable` returns true */
     def runOn(units: List[CompilationUnit])(using runCtx: Context): List[CompilationUnit] =

@@ -134,7 +134,7 @@ abstract class Recheck extends Phase, SymTransformer:
       sym.copySymDenotation(initFlags = sym.flags &~ Recheck.ResetPrivate | Private)
     else sym
 
-  def run(using Context): Unit =
+  override protected def run(using Context): Unit =
     val rechecker = newRechecker()
     rechecker.checkUnit(ctx.compilationUnit)
     rechecker.reset()
