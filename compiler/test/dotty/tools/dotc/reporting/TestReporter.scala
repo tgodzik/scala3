@@ -87,7 +87,7 @@ extends Reporter with UniqueMessagePositions with HideNonSensicalMessages with M
   }
 }
 
-class TestConsoleReporter(writer: PrintWriter) extends ConsoleReporter(null, writer) {
+class TestConsoleReporter(writer: PrintWriter) extends ConsoleReporter(scala.Console.in, writer) {
   // Report even info-level diagnostics if they've been explicitly enabled by -Ylog
   def isDiagnosticRelevant(dia: Diagnostic)(using Context): Boolean =
     dia.level >= WARNING || ctx.settings.Ylog.value.containsPhase(ctx.phase)
