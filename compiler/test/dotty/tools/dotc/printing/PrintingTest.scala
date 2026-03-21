@@ -31,7 +31,7 @@ class PrintingTest {
     List(s"-Vprint:$phase", "-color:never", "-nowarn", "-d", outDir, "-classpath", TestConfiguration.basicClasspath) ::: flags
 
   private def compileFile(path: JPath, phase: String): Boolean = {
-    val baseFilePath  = path.toString.stripSuffix(".scala")
+    val baseFilePath  = path.toString.stripSuffix(".scala").stripSuffix(".java")
     val checkFilePath = baseFilePath + ".check"
     val flagsFilePath = baseFilePath + ".flags"
     val byteStream    = new ByteArrayOutputStream()
