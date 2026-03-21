@@ -142,7 +142,8 @@ case class ScaladocTastyInspector()(using ctx: DocContext) extends Inspector:
     )
     "scala" -> aM.copy(
       kind = Kind.Class(Nil, Nil),
-      members = objectMembers
+      members = objectMembers,
+      modifiers = defn.ObjectClass.getExtraModifiers()
     )
 
 object ScaladocTastyInspector:
