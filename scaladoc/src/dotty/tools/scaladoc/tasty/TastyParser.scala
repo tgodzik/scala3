@@ -134,6 +134,7 @@ case class ScaladocTastyInspector()(using ctx: DocContext) extends Inspector:
 
   def mergeAnyRefAliasAndObject(parser: TastyParser) =
     import parser.qctx.reflect._
+    given parser.qctx.type = parser.qctx
     val javaLangObjectDef = defn.ObjectClass.tree.asInstanceOf[ClassDef]
     val objectMembers = parser.extractPatchedMembers(javaLangObjectDef)
     val aM = parser.parseTypeDef(
