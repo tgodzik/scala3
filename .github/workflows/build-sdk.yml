@@ -45,7 +45,7 @@ jobs:
         run : ./project/scripts/sbt dist/pack
 
       - name: Upload zip archive to GitHub Artifact (universal)
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         id  : universal
         with:
           path: ./dist/target/pack/*
