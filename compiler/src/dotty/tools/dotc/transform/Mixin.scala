@@ -293,11 +293,10 @@ class Mixin extends MiniPhase with SymTransformer { thisPhase =>
       yield transformFollowing(DefDef(mkForwarderSym(setter.asTerm), unitLiteral.withSpan(cls.span)))
 
     def mixinForwarders(mixin: ClassSymbol): List[Tree] =
-      for (meth <- mixin.info.decls.toList if needsMixinForwarder(meth))
-      yield {
+      for meth <- mixin.info.decls.filter(needsMixinForwarder)
+      yield
         util.Stats.record("mixin forwarders")
         transformFollowing(DefDef(mkForwarderSym(meth.asTerm, Bridge), forwarderRhsFn(meth)))
-      }
 
     cpy.Template(impl)(
       constr =
