@@ -3727,6 +3727,7 @@ Text => empty
 Language => Scala
 Symbols => 13 entries
 Occurrences => 35 entries
+Diagnostics => 3 entries
 Synthetics => 4 entries
 
 Symbols:
@@ -3780,6 +3781,11 @@ Occurrences:
 [22:2..22:3): V -> example/StructuralTypes.V.
 [22:4..22:13): scalameta -> local4
 [23:4..23:19): StructuralTypes -> example/StructuralTypes.
+
+Diagnostics:
+[15:2..15:11): [warning] A pure expression does nothing in statement position
+[16:2..16:10): [warning] A pure expression does nothing in statement position
+[22:2..22:13): [warning] A pure expression does nothing in statement position
 
 Synthetics:
 [15:2..15:6):user => reflectiveSelectable(*)
