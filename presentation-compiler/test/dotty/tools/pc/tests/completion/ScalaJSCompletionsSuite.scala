@@ -20,7 +20,7 @@ class ScalaJSCompletionsSuite extends BaseCompletionSuite {
 
   override protected def scalacOptions(classpath: Seq[Path]): Seq[String] = List("-scalajs")
 
-  override protected def additionalClasspath: Seq[Path] = BuildInfo.ideTestsScalaJSClasspath.map(_.toPath)
+  override protected def additionalClasspath: Seq[Path] = BuildInfo.ideTestsScalaJSClasspath.map(_.toPath.nn)
 
   @Test def plainScalaJS =
     check(
