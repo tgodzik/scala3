@@ -64,7 +64,7 @@ object language:
     /** Adds support for clause interleaving:
       * Methods can now have as many type clauses as they like, this allows to have type bounds depend on terms: `def f(x: Int)[A <: x.type]: A`
       *
-      * @see [[http://dotty.epfl.ch/docs/reference/other-new-features/explicit-nulls.html]]
+      * @see [[https://docs.scala-lang.org/sips/47.html]]
       */
     @compileTimeOnly("`clauseInterleaving` can only be used at compile time in import statements")
     object clauseInterleaving
@@ -94,7 +94,7 @@ object language:
     /** Experimental support for automatic conversions of arguments, without requiring
      *  a langauge import `import scala.language.implicitConversions`.
      *
-     *  @see [[https://dotty.epfl.ch/docs/reference/experimental/into-modifier]]
+     *  @see [[https://docs.scala-lang.org/scala3/reference/experimental/into-modifier.html]]
      */
     @compileTimeOnly("`into` can only be used at compile time in import statements")
     object into
@@ -161,7 +161,7 @@ object language:
   /** Unsafe Nulls fot Explicit Nulls
     * Inside the "unsafe" scope, `Null` is considered as a subtype of all reference types.
     *
-    * @see [[http://dotty.epfl.ch/docs/reference/other-new-features/explicit-nulls.html]]
+    * @see [[https://nightly.scala-lang.org/docs/reference/experimental/explicit-nulls.html]]
     */
   @compileTimeOnly("`unsafeNulls` can only be used at compile time in import statements")
   object unsafeNulls

@@ -2185,7 +2185,7 @@ object ScaladocConfigs {
   import Build._
   private lazy val currentYear: String = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR).toString
 
-  def dottyExternalMapping = ".*scala/.*::scaladoc3::https://dotty.epfl.ch/api/"
+  def dottyExternalMapping = ".*scala/.*::scaladoc3::https://nightly.scala-lang.org/api/"
   def javaExternalMapping = ".*java/.*::javadoc::https://docs.oracle.com/javase/8/docs/api/"
   def scalaSrcLink(v: String, s: String) = s"${s}github://scala/scala/v$v#src/library"
   def dottySrcLink(v: String, sourcesPrefix: String = "", outputPrefix: String = "") =
