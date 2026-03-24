@@ -3,7 +3,7 @@
 object test {
   opaque type Foo = Int
 
-  class Bar[A] extends compiletime.Erased
+  erased class Bar[A]
   object Bar { inline given inst[A]: Bar[A] = new Bar[A] }
 }
 
