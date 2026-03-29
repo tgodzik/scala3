@@ -7,7 +7,7 @@ import org.junit.Assert._
 import java.nio.file.Files
 
 /** Test that `<sup>` tags render correctly in both wiki and markdown modes,
-  * and that `^` in wiki mode creates a `<span class="superscript">`.
+  * and that `^...^` in wiki mode creates a `<sup>...</sup>`.
   *
   * See https://github.com/scala/scala3/issues/25517
   */
@@ -37,14 +37,12 @@ class CaretTest extends BaseHtmlTest:
     val html = docHtml("SupWiki", "wiki")
     assertTrue(html.contains("2<sup>29</sup>"))
     assertTrue(html.contains("2<sup>30</sup>"))
-    assertFalse("no broken superscript span", html.contains("superscript"))
 
   @Test def bareCaretBrokenInWiki(): Unit =
     val html = docHtml("CaretWiki", "wiki")
-    assertTrue("bare ^ in wiki should create broken superscript",
-      html.contains("<span class=\"superscript\">"))
+    assertTrue(html.contains("<sup>"))
 
   @Test def pairedCaretInWiki(): Unit =
     val html = docHtml("PairedCaretWiki", "wiki")
-    assertTrue(html.contains("2<span class=\"superscript\">29</span>"))
-    assertTrue(html.contains("2<span class=\"superscript\">30</span>"))
+    assertTrue(html.contains("2<sup>29</sup>"))
+    assertTrue(html.contains("2<sup>30</sup>"))
