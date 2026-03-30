@@ -705,7 +705,7 @@ object RefChecks {
 
         for (member <- missingMethods) {
           def showDclAndLocation(sym: Symbol) =
-            s"${sym.showDcl} in ${sym.owner.showLocated}"
+            s"${sym.mapInfo(replaceSyntheticParamNames).showDcl} in ${sym.owner.showLocated}"
           def undefined(msg: String) =
             abstractClassError(false, s"${showDclAndLocation(member)} is not defined $msg")
           val underlying = member.underlyingSymbol
