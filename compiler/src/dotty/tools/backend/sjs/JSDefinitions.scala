@@ -21,7 +21,7 @@ object JSDefinitions {
 
 final class JSDefinitions() {
 
-  private var initCtx: Context = uninitialized
+  private var initCtx: Context = _
   private given currentContext[Dummy_so_its_a_def]: Context = initCtx
 
   def init()(using Context): Unit =
