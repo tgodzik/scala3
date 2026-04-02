@@ -60,7 +60,10 @@ object HoverProvider:
     // For expression we need to find all enclosing applies to get the exact generic type
     val enclosing = path.expandRangeToEnclosingApply(pos)
 
-    if tp.isError || tpw == NoType || tpw.isError || path.isEmpty
+    if path.isEmpty || (
+        (tp.isError || tpw == NoType || tpw.isError) &&
+          MetalsInteractive.derivingOriginalTypeClass(enclosing, pos).isEmpty
+      )
     then
       def report =
         val posId =

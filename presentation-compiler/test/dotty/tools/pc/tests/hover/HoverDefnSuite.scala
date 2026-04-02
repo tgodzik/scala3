@@ -151,6 +151,19 @@ class HoverDefnSuite extends BaseHoverSuite:
       "trait MyTrait: MyTrait".hover
     )
 
+  /** https://github.com/scala/scala3/issues/19489 */
+  @Test def `derives-typeclass` =
+    check(
+      """|trait Foo[T]
+         |
+         |object Foo:
+         |  def derived[T]: Foo[T] = ???
+         |
+         |case class Pet(name: String, kind: String) derives F@@oo
+         |""".stripMargin,
+      "trait Foo[T]: Foo".hover
+    )
+
   @Test def `class` =
     check(
       """trait M@@yClass
