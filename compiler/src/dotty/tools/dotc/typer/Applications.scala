@@ -1516,7 +1516,7 @@ trait Applications extends Compatibility {
       val widened = TypeComparer.dropTransparentTraits(
         tree.tpe.parents.reduceLeft(TypeComparer.andType(_, _)),
         pt)
-      if widened <:< pt then Typed(tree, TypeTree(widened))
+      if widened <:< pt then Typed(tree, TypeTree(widened, inferred = true))
       else tree
     else tree
 
