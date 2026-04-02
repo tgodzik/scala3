@@ -2958,6 +2958,7 @@ object Parsers {
       }
       CaseDef(pat, EmptyTree, atSpan(accept(ARROW)) {
         val t = rejectWildcardType(typ())
+        in.observeOutdented()
         if in.token == SEMI then in.nextToken()
         newLinesOptWhenFollowedBy(CASE)
         t
