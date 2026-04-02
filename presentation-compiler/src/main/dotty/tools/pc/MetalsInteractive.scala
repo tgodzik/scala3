@@ -19,6 +19,7 @@ import Types.*
 import interactive.*
 import util.*
 import util.SourcePosition
+import dotc.typer.Deriving.OriginalTypeClass
 
 object MetalsInteractive:
   type NamedTupleArg = String
@@ -119,6 +120,27 @@ object MetalsInteractive:
   ): List[(Symbol, Type, Option[String])] =
     import indexed.ctx
     path match
+      case (tmpl: TypeDef) :: tail =>
+        println("--------------------------------")
+        val moduleTree = tail.headOption match
+          case Some(tree) =>
+            // println(tree.children.mkString("\n\n"))
+            println(tmpl.symbol.companionClass)
+            println(tree.children.map(_.symbol))
+            tree.children.find(_.symbol == tmpl.symbol.companionClass)
+          case _ =>
+            None
+        moduleTree match
+          case Some(tpe: TypeDef) =>
+            val derived =tpe.rhs.children.find(_.symbol.name.startsWith("derived$"))
+            println(derived)
+            println(derived.map(_.sourcePos))
+            println(derived.map(_.allAttachments))
+          case _ =>
+
+      case _ =>
+    path match
+
       // For a named arg, find the target `DefDef` and jump to the param
       case NamedArg(name, _) :: Apply(fn, _) :: _ =>
         val funSym = fn.symbol

@@ -28,6 +28,7 @@ import dotty.tools.dotc.util.SourcePosition
 import dotty.tools.pc.printer.ShortenedTypePrinter
 import dotty.tools.pc.printer.ShortenedTypePrinter.IncludeDefaultParam
 import dotty.tools.pc.utils.InteractiveEnrichments.*
+import scala.annotation.tailrec
 
 object HoverProvider:
 
@@ -52,21 +53,26 @@ object HoverProvider:
       .getOrElse(Interactive.pathTo(driver.openedTrees(uri), pos))
     val indexedContext = IndexedContext(pos)(using ctx)
 
-    def typeFromPath(path: List[Tree]) =
-      if path.isEmpty then NoType else path.head.typeOpt
+    @tailrec
+    def typeFromPath(path: List[Tree]): (Type, List[Tree]) =
+      if path.isEmpty then (NoType, path) else
+        val tpe = path.head.typeOpt
+        val tpw = tpe.widenTermRefExpr
+        if tpw == NoType then typeFromPath(path.tail) else (tpe, path)
 
-    val tp = typeFromPath(path)
-    val tpw = tp.widenTermRefExpr
+    val (tp, skippedPath) = typeFromPath(path)
+    val maybeTpw = tp.widenTermRefExpr
+    val tpw = if maybeTpw == NoType then tp else tp.widenTermRefExpr
     // For expression we need to find all enclosing applies to get the exact generic type
-    val enclosing = path.expandRangeToEnclosingApply(pos)
+    val enclosing = skippedPath.expandRangeToEnclosingApply(pos)
 
-    if tp.isError || tpw == NoType || tpw.isError || path.isEmpty
+    if tp.isError || tpw == NoType || tpw.isError || skippedPath.isEmpty
     then
       def report =
         val posId =
-          if path.isEmpty || !path.head.sourcePos.exists
+          if skippedPath.isEmpty || !skippedPath.head.sourcePos.exists
           then pos.start
-          else path.head.sourcePos.start
+          else skippedPath.head.sourcePos.start
         Report(
           "empty-hover-scala3",
           s"""|$uri
@@ -94,7 +100,7 @@ object HoverProvider:
       val skipCheckOnName =
         !pos.isPoint // don't check isHoveringOnName for RangeHover
 
-      val printerCtx = Interactive.contextOfPath(path)
+      val printerCtx = Interactive.contextOfPath(skippedPath)
       val printer = ShortenedTypePrinter(search, IncludeDefaultParam.Include)(
         using IndexedContext(pos)(using printerCtx)
       )
@@ -105,10 +111,10 @@ object HoverProvider:
         skipCheckOnName
       ) match
         case Nil =>
-          fallbackToDynamics(path, printer, contentType)
+          fallbackToDynamics(skippedPath, printer, contentType)
         case (symbol, tpe, _) :: _
             if symbol.name == nme.selectDynamic || symbol.name == nme.applyDynamic =>
-          fallbackToDynamics(path, printer, contentType)
+          fallbackToDynamics(skippedPath, printer, contentType)
         case symbolTpes @ ((symbol, tpe, None) :: _) =>
           val exprTpw = tpe.widenTermRefExpr.deepDealiasAndSimplify
           val hoverString =
