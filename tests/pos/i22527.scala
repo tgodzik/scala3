@@ -4,15 +4,16 @@ import annotation.*
 
 def f: Unit =
   identity(
-    identity:
+    identity{
       class X extends AnyRef, Serializable
       42
+    }
   )
 
 def test: Unit =
   assert(
-    identity:
-      true,
+    identity{
+      true},
     "ok"
   )
 

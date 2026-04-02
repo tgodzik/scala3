@@ -2,7 +2,7 @@ trait A[B[_]]:
   type C
 
 object A:
-  given A[Option]:
+  given A[Option] with
     type C = Option[Int]
 
   def apply[E[_], F](e: E[F])(using a: A[E]): a.C = ???
