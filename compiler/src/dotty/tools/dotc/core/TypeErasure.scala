@@ -917,11 +917,15 @@ class TypeErasure(sourceLanguage: SourceLanguage, semiEraseVCs: Boolean, isConst
             // forwarders to mixin methods.
             // See doc comment for ElimByName for speculation how we could improve this.
         else
-          MethodType(Nil, Nil,
-            eraseResult(rt.translateFromRepeated(toArray = sourceLanguage.isJava)))
+          val erasedRT = eraseResult(rt.translateFromRepeated(toArray = sourceLanguage.isJava))
+          if !erasedRT.exists then NoType
+          else MethodType(Nil, Nil, erasedRT)
       case tp1: PolyType =>
         eraseResult(tp1.resultType) match
           case rt: MethodType => rt
+          case rt if !rt.exists =>
+            // Same situation as MethodType + eraseResult => NoType in `apply` (see i15377).
+            NoType
           case rt => MethodType(Nil, Nil, rt)
       case tp1 =>
         this(tp1)
