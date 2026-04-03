@@ -7,7 +7,7 @@ class TC[A] {
 }
 
 object TC {
-  transparent inline def derived[Left: Mirror.ProductOf as m]: TC[Left] =
+  transparent inline def derived[Left](using m: Mirror.ProductOf[Left]): TC[Left] =
     ${ derivedImpl[Left, m.MirroredElemTypes] }
 
   private def derivedImpl[Left: Type, LeftTypes: Type](using Quotes): Expr[TC[Left]] =

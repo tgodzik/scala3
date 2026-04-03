@@ -142,7 +142,7 @@ object SpaceEngine {
             try
               expandCaseClass(typ.tp) match
                 case null => space
-                case prod => if prod.simplify == Empty then Empty else space
+                case prod => if prod.nn.simplify == Empty then Empty else space
             finally expanding -= cls
           case _ => space
     case _ => space
