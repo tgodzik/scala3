@@ -46,12 +46,16 @@ abstract class Lifter {
   /** The tree of a lifted definition */
   protected def liftedDef(sym: TermSymbol, rhs: Tree)(using Context): MemberDef = ValDef(sym, rhs)
 
+  /** Type assigned to a lifted temporary symbol. */
+  protected def liftedExprType(expr: Tree)(using Context): Type =
+    expr.tpe.widen.deskolemized
+
   private def lift(defs: mutable.ListBuffer[Tree], expr: Tree, prefix: TermName = EmptyTermName)(using Context): Tree =
     if (noLift(expr)) expr
     else {
       val name = UniqueName.fresh(prefix)
       // don't instantiate here, as the type params could be further constrained, see tests/pos/pickleinf.scala
-      var liftedType = expr.tpe.widen.deskolemized
+      var liftedType = liftedExprType(expr)
       if (liftedFlags.is(Method)) liftedType = ExprType(liftedType)
       val lifted = newSymbol(ctx.owner, name, liftedFlags | Synthetic, liftedType, coord = spanCoord(expr.span),
         // Lifted definitions will be added to a local block, so they need to be
@@ -211,6 +215,16 @@ object LiftCoverage extends LiftImpure {
 
   override def noLift(expr: tpd.Tree)(using Context) =
     if liftingArgs then noLiftArg(expr) else super.noLift(expr)
+
+  /** Preserve singleton precision for lifted coverage temps when the underlying value is a
+   *  compile-time constant (same notion ConstFold uses), so constant re-folding after lifting
+   *  still matches the original inferred singleton type. Everything else uses the base widen.
+   */
+  override protected def liftedExprType(expr: tpd.Tree)(using Context): Type =
+    val dealiased = expr.tpe.dealias.deskolemized
+    dealiased.widenTermRefExpr.normalized.simplified match
+      case _: ConstantType => dealiased
+      case _ => super.liftedExprType(expr)
 
   def liftForCoverage(defs: mutable.ListBuffer[tpd.Tree], tree: tpd.Apply)(using Context) = {
     val liftedFun = liftApp(defs, tree.fun)
