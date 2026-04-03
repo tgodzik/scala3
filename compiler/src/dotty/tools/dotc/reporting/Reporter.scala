@@ -159,10 +159,14 @@ abstract class Reporter extends interfaces.ReporterResult {
     unreportedWarnings = unreportedWarnings.updated(key, count + n)
 
   /** Issue the diagnostic, ignoring `-Wconf` and `@nowarn` configurations,
-   *  but still honouring `-nowarn`, `-Werror`, and conditional warnings. */
-  def issueUnconfigured(dia: Diagnostic)(using Context): Unit = dia match
+   *  but still honouring `-nowarn`, `-Werror`, and conditional warnings.
+   *
+   *  Avoid forcing elaboration of the message, but if already `forced`,
+   *  then do issue the diagnostic with usual `isHidden` check.
+   */
+  def issueUnconfigured(dia: Diagnostic, forced: Boolean = false)(using Context): Unit = dia match
     case w: Warning if ctx.settings.silentWarnings.value    =>
-    case w: ConditionalWarning if w.isSummarizedConditional =>
+    case w: ConditionalWarning if !forced && w.isSummarizedConditional =>
       val key = w.enablingOption.name
       addUnreported(key, 1)
     case _                                                  =>
@@ -193,9 +197,12 @@ abstract class Reporter extends interfaces.ReporterResult {
   end issueUnconfigured
 
   def issueIfNotSuppressed(dia: Diagnostic)(using Context): Unit =
-    def toErrorIfFatal(dia: Diagnostic) = dia match
+    /** When `wconfEmitsFull`, a conditional warning was matched by `-Wconf` and fully emitted:
+     *  `-Werror` must still apply, unlike summarized conditional warnings (no `-deprecation`, etc.).
+     */
+    def toErrorIfFatal(dia: Diagnostic, wconfEmitsFull: Boolean = false) = dia match
       case w: Warning if ctx.settings.silentWarnings.value => dia
-      case w: ConditionalWarning if w.isSummarizedConditional => dia
+      case w: ConditionalWarning if !wconfEmitsFull && w.isSummarizedConditional => dia
       case w: Warning if ctx.settings.XfatalWarnings.value => w.toError
       case _ => dia
 
@@ -204,10 +211,11 @@ abstract class Reporter extends interfaces.ReporterResult {
       dia match
         case w: Warning => WConf.parsed.action(dia) match
           case Error   => issueUnconfigured(w.toError)
-          case Warning => issueUnconfigured(toErrorIfFatal(w))
+          case Warning => issueUnconfigured(toErrorIfFatal(w, wconfEmitsFull = true), forced = true)
           case Verbose => issueUnconfigured(toErrorIfFatal(w.setVerbose()))
           case Info    => issueUnconfigured(w.toInfo)
           case Silent  =>
+          case Default => issueUnconfigured(toErrorIfFatal(w))
         case _ => issueUnconfigured(dia)
 
     // `ctx.run` can be null in test, also in the repl when parsing the first line. The parser runs early, the Run is

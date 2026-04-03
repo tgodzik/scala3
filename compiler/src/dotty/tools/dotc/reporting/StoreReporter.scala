@@ -4,7 +4,6 @@ package reporting
 
 import core.Contexts.*
 import collection.mutable
-import config.Printers.typr
 import Diagnostic.*
 
 /** This class implements a Reporter that stores all messages
@@ -22,7 +21,6 @@ class StoreReporter(outer: Reporter | Null = Reporter.NoReporter, fromTyperState
   protected var infos: mutable.ListBuffer[Diagnostic] | Null = null
 
   override def doReport(dia: Diagnostic)(using Context): Unit = {
-    typr.println(s">>>> StoredError: ${dia.message}") // !!! DEBUG
     if (infos == null) infos = new mutable.ListBuffer
     infos.uncheckedNN += dia
   }
@@ -49,6 +47,6 @@ class StoreReporter(outer: Reporter | Null = Reporter.NoReporter, fromTyperState
   // so that then only when the messages are unbuffered (when the reporter if flushed)
   // do they go through -Wconf, and possibly then buffered on the Run as a suspended message
   override def report(dia: Diagnostic)(using Context): Unit =
-    if fromTyperState then issueUnconfigured(dia)
+    if fromTyperState then issueUnconfigured(dia, forced = false)
     else super.report(dia)
 }
