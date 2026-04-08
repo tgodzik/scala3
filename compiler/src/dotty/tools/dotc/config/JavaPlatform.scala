@@ -76,4 +76,8 @@ class JavaPlatform extends Platform {
 
   def newClassLoader(bin: AbstractFile)(using Context): SymbolLoader =
     new ClassfileLoader(bin)
+
+  def typeMightBeSubtypeAtRuntime(c: Symbol, potentialSuperClass: Symbol)(using Context): Boolean =
+    // On the JVM, we add an implementation of Serializable to everything
+    potentialSuperClass == defn.JavaSerializableClass
 }

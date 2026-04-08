@@ -1,15 +1,14 @@
-// scalajs: --skip
-// (because scala.js has special semantics for numbers)
+// special version if i1354 that applies to Scala.js as well
 
 object Test {
   def foo(a: Int | Double) = a match {
-    case a: (Float | Boolean) => 1
+    case a: (Char | Boolean) => 1
     case _ => 0
   }
 
-  def typeTest(a: Int | Double) = a.isInstanceOf[Float | Boolean] // false
+  def typeTest(a: Int | Double) = a.isInstanceOf[Char | Boolean] // false
 
-  def typeCast(a: Int | Double) = a.asInstanceOf[Float | Boolean] // no error
+  def typeCast(a: Int | Double) = a.asInstanceOf[Char | Boolean] // no error
 
   def main(args: Array[String]): Unit = {
     println(foo(4))
