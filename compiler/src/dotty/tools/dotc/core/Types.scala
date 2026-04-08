@@ -4067,9 +4067,14 @@ object Types extends TypeUtils {
         }
         dropDependencies(resultType)
       else resultType
+      
+     /** Are all parameter names synthetic? */
+    def allParamNamesSynthetic = paramNames.zipWithIndex.forall{ (name, i) =>
+      name == nme.syntheticParamName(i)
+    }
   }
 
-  abstract case class MethodType(paramNames: List[TermName])(
+   abstract case class MethodType(paramNames: List[TermName])(
       paramInfosExp: MethodType => List[Type],
       resultTypeExp: MethodType => Type)
     extends MethodOrPoly with TermLambda with NarrowCached { thisMethodType =>
