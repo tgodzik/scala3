@@ -2049,8 +2049,11 @@ class Definitions {
   val ScalaNumericValueClasses: PerRun[collection.Set[Symbol]] = new PerRun(ScalaNumericValueTypes.map(_.symbol))
   val ScalaValueClasses: PerRun[collection.Set[Symbol]]        = new PerRun(ScalaValueTypes.map(_.symbol))
 
+  val ScalaNumericBoxedClasses: PerRun[collection.Set[Symbol]] = new PerRun(
+    Set(BoxedByteClass, BoxedShortClass, BoxedCharClass, BoxedIntClass, BoxedLongClass, BoxedFloatClass, BoxedDoubleClass)
+  )
   val ScalaBoxedClasses: PerRun[collection.Set[Symbol]] = new PerRun(
-    Set(BoxedByteClass, BoxedShortClass, BoxedCharClass, BoxedIntClass, BoxedLongClass, BoxedFloatClass, BoxedDoubleClass, BoxedUnitClass, BoxedBooleanClass)
+    ScalaNumericBoxedClasses() `union` Set(BoxedUnitClass, BoxedBooleanClass)
   )
 
   private val valueTypeEnc = mutable.Map[TypeName, PrimitiveClassEnc]()
