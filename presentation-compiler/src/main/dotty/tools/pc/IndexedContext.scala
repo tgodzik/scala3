@@ -18,9 +18,11 @@ import dotty.tools.dotc.typer.ImportInfo
 import dotty.tools.dotc.util.SourcePosition
 import dotty.tools.pc.IndexedContext.Result
 import dotty.tools.pc.utils.InteractiveEnrichments.*
+import dotty.tools.dotc.interactive.Completion.CompletionResult
 
 sealed trait IndexedContext:
   given ctx: Context
+  def scopeContext: CompletionResult
   def scopeSymbols: List[Symbol]
   def rename(sym: Symbol): Option[String]
   def findSymbol(name: Name, fromPrefix: Option[Type] = None): Option[List[Symbol]]
@@ -81,6 +83,7 @@ object IndexedContext:
 
   case object Empty extends IndexedContext:
     given ctx: Context = NoContext
+    def scopeContext: CompletionResult = CompletionResult(Map.empty, Map.empty)
     def findSymbol(name: Name, fromPrefix: Option[Type]): Option[List[Symbol]] = None
     def findSymbolInLocalScope(name: String): Option[List[Symbol]] = None
     def scopeSymbols: List[Symbol] = List.empty
@@ -88,10 +91,10 @@ object IndexedContext:
 
   class LazyWrapper(pos: SourcePosition)(using val ctx: Context) extends IndexedContext:
 
-    val completionContext = Completion.scopeContext(pos)
-    val names: Map[String, Seq[SingleDenotation]] = completionContext.names.toList.groupBy(_._1.show).map {
+    val scopeContext: CompletionResult = Completion.scopeContext(pos)
+    val names: Map[String, Seq[SingleDenotation]] = scopeContext.names.toList.groupBy(_._1.show).map {
       case (name, denotations) =>
-        val denots = denotations.flatMap(_._2)
+        val denots = denotations.flatMap(_._2.denots)
         val nonRoot = denots.filter(!_.symbol.owner.isRoot)
         val (importedByDefault, conflictingValue) =
           denots.partition(denot => Interactive.isImportedByDefault(denot.symbol))
@@ -100,7 +103,7 @@ object IndexedContext:
         else
           name.trim -> nonRoot
     }
-    val renames = completionContext.renames
+    val renames = scopeContext.renames
 
     def defaultScopes(name: Name): Option[List[Symbol]] =
       List(defn.ScalaPredefModuleClass, defn.ScalaPackageClass, defn.JavaLangPackageClass)

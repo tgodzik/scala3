@@ -140,7 +140,8 @@ class Completions(
         completionPos.query,
         fromPath,
         adjustedPath,
-        Some(fuzzyMatcher)
+        Some(fuzzyMatcher),
+        calculatedScopeContext = Some(indexedContext.scopeContext)
       )
 
     compilerCompletions
@@ -300,7 +301,7 @@ class Completions(
         symbol.info.member(nme.CONSTRUCTOR).allSymbols
       catch case NonFatal(_) => Nil
     val sym = denot.symbol
-    val hasNonSyntheticConstructor = sym.name.isTypeName && sym.isClass
+    def hasNonSyntheticConstructor = sym.name.isTypeName && sym.isClass
       && !sym.is(ModuleClass) && !sym.is(Trait) && !sym.is(Abstract) && !sym.is(Flags.JavaDefined)
 
     val (extraMethodDenots, skipOriginalDenot): (List[SingleDenotation], Boolean) =
