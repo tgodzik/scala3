@@ -5,7 +5,7 @@
    |The tree does not conform to the compiler's tree invariants.
    |
    |Macro was:
-   |scala.quoted.runtime.Expr.splice[scala.Unit](((contextual$2: scala.quoted.Quotes) ?=> Macro.fooImpl[scala.Int](scala.quoted.Type.of[scala.Int](contextual$2), contextual$2)))
+   |scala.quoted.runtime.Expr.splice[scala.Unit](((evidence$2: scala.quoted.Quotes) ?=> Macro.fooImpl[scala.Int](scala.quoted.Type.of[scala.Int](evidence$2), evidence$2)))
    |
    |The macro returned:
    |Macro_1$package.useTag[scala.Int](Tag.apply[scala.Int])
