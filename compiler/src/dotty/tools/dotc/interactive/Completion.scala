@@ -57,7 +57,6 @@ object Completion:
     // val completionContext = Interactive.contextOfPath(tpdPath).withPhase(Phases.typerPhase)
     inContext(completionContext):
       val untpdPath = Interactive.resolveTypedOrUntypedPath(tpdPath, pos)
-      val rawPrefix = completionPrefix(untpdPath, pos)
       // Lazy mode is to avoid too many checks as it's mostly for printing types
       val completer = new Completer(Mode.Lazy, pos, untpdPath, _ => true)
       completer.scopeCompletions
@@ -748,7 +747,7 @@ object Completion:
     /** Filter for names that should appear when looking for completions. */
     private object completionsFilter extends NameFilter:
       def apply(pre: Type, name: Name)(using Context): Boolean =
-        !name.isConstructorName && name.toTermName.info.kind == SimpleNameKind
+        !name.isConstructorName && name.toTermName.info.kind == SimpleNameKind && matches(name)
       def isStable = true
 
     extension (denotations: Seq[SingleDenotation])
