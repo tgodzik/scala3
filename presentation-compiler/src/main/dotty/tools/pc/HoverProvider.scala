@@ -50,7 +50,8 @@ object HoverProvider:
     val path = unit
       .map(unit => Interactive.pathTo(unit.tpdTree, pos.span))
       .getOrElse(Interactive.pathTo(driver.openedTrees(uri), pos))
-    val indexedContext = IndexedContext(pos)(using ctx)
+    val indexedContext = IndexedContext(pos, path, ctx)
+    import indexedContext.ctx
 
     def typeFromPath(path: List[Tree]) =
       if path.isEmpty then NoType else path.head.typeOpt
@@ -170,6 +171,10 @@ object HoverProvider:
     else
       val skipCheckOnName =
         !pos.isPoint // don't check isHoveringOnName for RangeHover
+
+      val printer = ShortenedTypePrinter(search, IncludeDefaultParam.Include)(
+        using indexedContext
+      )
       MetalsInteractive.enclosingSymbolsWithExpressionType(
         enclosing,
         pos,

@@ -52,9 +52,9 @@ object Completion:
 
   private val logger = Logger.getLogger(this.getClass.getName)
 
-  def scopeContext(pos: SourcePosition)(using Context): CompletionResult =
-    val tpdPath = Interactive.pathTo(ctx.compilationUnit.tpdTree, pos.span)
-    val completionContext = Interactive.contextOfPath(tpdPath).withPhase(Phases.typerPhase)
+  def scopeContext(pos: SourcePosition, tpdPath: List[tpd.Tree], completionContext: Context)(using Context): CompletionResult =
+    // val tpdPath = Interactive.pathTo(ctx.compilationUnit.tpdTree, pos.span)
+    // val completionContext = Interactive.contextOfPath(tpdPath).withPhase(Phases.typerPhase)
     inContext(completionContext):
       val untpdPath = Interactive.resolveTypedOrUntypedPath(tpdPath, pos)
       val rawPrefix = completionPrefix(untpdPath, pos)

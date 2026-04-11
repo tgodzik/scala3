@@ -12,6 +12,7 @@ import dotty.tools.dotc.core.Names.*
 import dotty.tools.dotc.core.Scopes.EmptyScope
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.*
+import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.interactive.Completion
 import dotty.tools.dotc.interactive.Interactive
 import dotty.tools.dotc.typer.ImportInfo
@@ -19,6 +20,7 @@ import dotty.tools.dotc.util.SourcePosition
 import dotty.tools.pc.IndexedContext.Result
 import dotty.tools.pc.utils.InteractiveEnrichments.*
 import dotty.tools.dotc.interactive.Completion.CompletionResult
+import dotty.tools.dotc.core.Phases
 
 sealed trait IndexedContext:
   given ctx: Context
@@ -76,10 +78,13 @@ end IndexedContext
 
 object IndexedContext:
 
-  def apply(pos: SourcePosition)(using Context): IndexedContext =
-    ctx match
+  def apply(pos: SourcePosition, tpdPath: List[tpd.Tree], driverCtx: Context): IndexedContext =
+    driverCtx match
       case NoContext => Empty
-      case _ => LazyWrapper(pos)(using ctx)
+      case _ =>
+        val typerCtx: Context = Interactive
+           .contextOfPath(tpdPath)(using driverCtx).withPhase(Phases.typerPhase(using driverCtx))
+        LazyWrapper(pos, tpdPath)(using typerCtx)
 
   case object Empty extends IndexedContext:
     given ctx: Context = NoContext
@@ -89,9 +94,9 @@ object IndexedContext:
     def scopeSymbols: List[Symbol] = List.empty
     def rename(sym: Symbol): Option[String] = None
 
-  class LazyWrapper(pos: SourcePosition)(using val ctx: Context) extends IndexedContext:
+  class LazyWrapper(pos: SourcePosition, tpdPath: List[tpd.Tree])(using val ctx: Context) extends IndexedContext:
 
-    val scopeContext: CompletionResult = Completion.scopeContext(pos)
+    val scopeContext: CompletionResult = Completion.scopeContext(pos, tpdPath, ctx)
     val names: Map[String, Seq[SingleDenotation]] = scopeContext.names.toList.groupBy(_._1.show).map {
       case (name, denotations) =>
         val denots = denotations.flatMap(_._2.denots)

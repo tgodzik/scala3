@@ -20,6 +20,8 @@ import dotty.tools.pc.completions.CompletionPos
 import dotty.tools.pc.utils.InteractiveEnrichments.*
 
 import org.eclipse.lsp4j as l
+import dotty.tools.dotc.core.Phases
+import dotty.tools.dotc.core.Contexts.Context
 
 final class AutoImportsProvider(
     search: SymbolSearch,
@@ -44,10 +46,7 @@ final class AutoImportsProvider(
     val newctx = driver.currentCtx.fresh.setCompilationUnit(unit)
     val path =
       Interactive.pathTo(newctx.compilationUnit.tpdTree, pos.span)(using newctx)
-
-    val indexedContext = IndexedContext(pos)(
-      using Interactive.contextOfPath(path)(using newctx)
-    )
+    val indexedContext = IndexedContext(pos, path, newctx)
     import indexedContext.ctx
 
     def correctInTreeContext(sym: Symbol) = path match
