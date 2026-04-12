@@ -216,7 +216,6 @@ class PcInlayHintsProvider(
     val usedRenames = printer.getUsedRenames
     val parts = partsFromType(dealiased, usedRenames)
     InlayHints.makeLabelParts(parts, tpeStr)
-  end toLabelParts
 
   private val definitions = {
     val tpdPath =

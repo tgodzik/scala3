@@ -40,7 +40,8 @@ object SignatureHelpProvider:
         val newctx = driver.currentCtx.fresh.setCompilationUnit(unit)
         val indexedContext = IndexedContext(pos, path, newctx)
 
-        given Context = newctx.setPrinterFn(_ => ShortenedTypePrinter(search, IncludeDefaultParam.Never)(using indexedContext))
+        given Context =
+          newctx.setPrinterFn(_ => ShortenedTypePrinter(search, IncludeDefaultParam.Never)(using indexedContext))
 
         val (paramN, callableN, alternatives) = Signatures.signatureHelp(path, pos.span)
 

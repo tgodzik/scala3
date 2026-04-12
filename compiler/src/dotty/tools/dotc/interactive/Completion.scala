@@ -53,8 +53,6 @@ object Completion:
   private val logger = Logger.getLogger(this.getClass.getName)
 
   def scopeContext(pos: SourcePosition, tpdPath: List[tpd.Tree], completionContext: Context)(using Context): CompletionResult =
-    // val tpdPath = Interactive.pathTo(ctx.compilationUnit.tpdTree, pos.span)
-    // val completionContext = Interactive.contextOfPath(tpdPath).withPhase(Phases.typerPhase)
     inContext(completionContext):
       val untpdPath = Interactive.resolveTypedOrUntypedPath(tpdPath, pos)
       // Lazy mode is to avoid too many checks as it's mostly for printing types
@@ -65,14 +63,14 @@ object Completion:
    *
    *  @return offset and list of symbols for possible completions
    */
-  def completions(pos: SourcePosition, calculatedScopeContext: Option[CompletionResult] = None)(using Context): (Int, List[Completion]) =
+  def completions(pos: SourcePosition)(using Context): (Int, List[Completion]) =
     val tpdPath = Interactive.pathTo(ctx.compilationUnit.tpdTree, pos.span)
     val completionContext = Interactive.contextOfPath(tpdPath).withPhase(Phases.typerPhase)
     inContext(completionContext):
       val untpdPath = Interactive.resolveTypedOrUntypedPath(tpdPath, pos)
       val mode = completionMode(untpdPath, pos)
       val rawPrefix = completionPrefix(untpdPath, pos)
-      val completions = rawCompletions(pos, mode, rawPrefix, tpdPath, untpdPath, calculatedScopeContext = calculatedScopeContext)
+      val completions = rawCompletions(pos, mode, rawPrefix, tpdPath, untpdPath)
       postProcessCompletions(untpdPath, completions, rawPrefix)
 
   /** Get possible completions from tree at `pos`
@@ -87,7 +85,7 @@ object Completion:
     tpdPath: List[tpd.Tree],
     untpdPath: List[untpd.Tree],
     customMatcher: Option[Name => Boolean] = None,
-    calculatedScopeContext: Option[CompletionResult]
+    calculatedScopeContext: Option[CompletionResult] = None
   )(using Context): CompletionMap =
     val adjustedPath = typeCheckExtensionConstructPath(untpdPath, tpdPath, pos)
     computeCompletions(pos, mode, rawPrefix, adjustedPath, untpdPath, customMatcher, calculatedScopeContext)

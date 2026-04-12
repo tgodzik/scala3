@@ -20,8 +20,6 @@ import dotty.tools.pc.completions.CompletionPos
 import dotty.tools.pc.utils.InteractiveEnrichments.*
 
 import org.eclipse.lsp4j as l
-import dotty.tools.dotc.core.Phases
-import dotty.tools.dotc.core.Contexts.Context
 
 final class AutoImportsProvider(
     search: SymbolSearch,

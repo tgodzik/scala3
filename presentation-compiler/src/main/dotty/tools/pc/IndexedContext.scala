@@ -1,26 +1,28 @@
 package dotty.tools.pc
 
 import scala.annotation.tailrec
+import scala.meta.pc.OffsetParams
 import scala.util.control.NonFatal
 
+import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.core.Contexts.*
 import dotty.tools.dotc.core.Denotations.PreDenotation
 import dotty.tools.dotc.core.Denotations.SingleDenotation
 import dotty.tools.dotc.core.Flags.*
 import dotty.tools.dotc.core.NameOps.*
 import dotty.tools.dotc.core.Names.*
+import dotty.tools.dotc.core.Phases
 import dotty.tools.dotc.core.Scopes.EmptyScope
 import dotty.tools.dotc.core.Symbols.*
 import dotty.tools.dotc.core.Types.*
-import dotty.tools.dotc.ast.tpd
 import dotty.tools.dotc.interactive.Completion
+import dotty.tools.dotc.interactive.Completion.CompletionResult
 import dotty.tools.dotc.interactive.Interactive
+import dotty.tools.dotc.interactive.InteractiveDriver
 import dotty.tools.dotc.typer.ImportInfo
 import dotty.tools.dotc.util.SourcePosition
 import dotty.tools.pc.IndexedContext.Result
 import dotty.tools.pc.utils.InteractiveEnrichments.*
-import dotty.tools.dotc.interactive.Completion.CompletionResult
-import dotty.tools.dotc.core.Phases
 
 sealed trait IndexedContext:
   given ctx: Context
@@ -83,7 +85,7 @@ object IndexedContext:
       case NoContext => Empty
       case _ =>
         val typerCtx: Context = Interactive
-           .contextOfPath(tpdPath)(using driverCtx).withPhase(Phases.typerPhase(using driverCtx))
+          .contextOfPath(tpdPath)(using driverCtx).withPhase(Phases.typerPhase(using driverCtx))
         LazyWrapper(pos, tpdPath)(using typerCtx)
 
   case object Empty extends IndexedContext:
