@@ -939,7 +939,7 @@ object Build {
         (`tasty-core-bootstrapped` / publishLocalBin),
         (`scala3-staging` / publishLocalBin),
         (`scala3-tasty-inspector` / publishLocalBin),
-        (scaladoc / publishLocalBin),
+        // (scaladoc / publishLocalBin),
         (`scala3-repl` / publishLocalBin),
         publishLocalBin,
       ).evaluated,
@@ -1281,7 +1281,7 @@ object Build {
       Compile / resourceGenerators += generateLibraryProperties.taskValue,
       bspEnabled := enableBspAllProjects,
       Compile / mainClass := None,
-
+      doc / skip := true,
       Test / unmanagedSourceDirectories   := Seq(baseDirectory.value / "test"),
       Test / unmanagedResourceDirectories := Seq(baseDirectory.value / "test-resources"),
       libraryDependencies ++= Seq(
@@ -1717,6 +1717,7 @@ object Build {
       Test    / publishArtifact := false,
       // Do not allow to publish this project for now
       publish / skip := false,
+      Compile /doc / skip := true,
       // Project specific target folder. sbt doesn't like having two projects using the same target folder
       target := target.value / "scala3-compiler-bootstrapped",
       // Generate compiler.properties, used by sbt
@@ -2179,8 +2180,9 @@ object Build {
       BuildInfoPlugin.buildInfoDefaultSettings
 
   lazy val presentationCompilerSettings = {
-    val mtagsVersion = "1.6.3"
+    val mtagsVersion = "1.6.7"
     Seq(
+      resolvers += "Sonatype OSS Snapshots" at "https://central.sonatype.com/repository/maven-snapshots",
       libraryDependencies ++= Seq(
         "org.lz4" % "lz4-java" % "1.8.0",
         "io.get-coursier" % "interface" % "1.0.18",

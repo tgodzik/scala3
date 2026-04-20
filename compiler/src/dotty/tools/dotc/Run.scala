@@ -525,7 +525,6 @@ extends ImplicitRunInfo, ConstraintRunInfo, cc.CaptureRunInfo {
     val sources =
       scalaSources.map(sourceFile(_, isJava = false)) ++
        javaSources.map(sourceFile(_, isJava = true))
-
     compileSources(sources)
   }
 
