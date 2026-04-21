@@ -190,8 +190,7 @@ class PcInlayHintsProvider(
       tpe: Type,
       pos: SourcePosition
   ): List[LabelPart] =
-    val tpdPath =
-      Interactive.pathTo(unit.tpdTree, pos.span)
+    val tpdPath = Interactive.pathTo(unit.tpdTree, pos.span)
     val newctx = driver.currentCtx.fresh.setCompilationUnit(unit)
     val indexedCtx = IndexedContext(pos, tpdPath, newctx)
     import indexedCtx.ctx
@@ -217,16 +216,10 @@ class PcInlayHintsProvider(
     val parts = partsFromType(dealiased, usedRenames)
     InlayHints.makeLabelParts(parts, tpeStr)
 
-  private val definitions = {
-    val tpdPath =
-      Interactive.pathTo(unit.tpdTree, pos.span)
-    val newctx = driver.currentCtx.fresh.setCompilationUnit(unit)
-    IndexedContext(pos, tpdPath, newctx).ctx.definitions
-  }
   private def syntheticTupleApply(tree: Tree): Boolean =
     tree match
       case sel: Select =>
-        if definitions.isTupleNType(sel.symbol.info.finalResultType) then
+        if ctx.definitions.isTupleNType(sel.symbol.info.finalResultType) then
           sel match
             case Select(tupleClass: Ident, _)
                 if !tupleClass.span.isZeroExtent &&
