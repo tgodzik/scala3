@@ -58,18 +58,6 @@ object InteractiveEnrichments extends CommonMtagsEnrichments:
 
       new SourcePosition(source, span)
 
-    def localContext(params: OffsetParams): Context =
-      if driver.currentCtx.run.nn.units.isEmpty then
-        throw new RuntimeException(
-          "No source files were passed to the Scala 3 presentation compiler"
-        )
-      val unit = driver.currentCtx.run.nn.units.head
-      val pos = driver.sourcePosition(params)
-      val newctx = driver.currentCtx.fresh.setCompilationUnit(unit)
-      val tpdPath =
-        Interactive.pathTo(newctx.compilationUnit.tpdTree, pos.span)(using newctx)
-      Interactive.contextOfPath(tpdPath)(using newctx)
-
   end extension
 
   extension (pos: SourcePosition)

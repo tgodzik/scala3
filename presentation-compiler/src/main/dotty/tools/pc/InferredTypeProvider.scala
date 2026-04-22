@@ -71,11 +71,11 @@ final class InferredTypeProvider(
     driver.run(uri, source)
     val unit = driver.currentCtx.run.nn.units.head
     val pos = driver.sourcePosition(params)
+    val newctx = driver.currentCtx.fresh.setCompilationUnit(unit)
     val path =
-      Interactive.pathTo(driver.openedTrees(uri), pos)(using driver.currentCtx)
-
-    given locatedCtx: Context = driver.localContext(params)
-    val indexedCtx = IndexedContext(pos)(using locatedCtx)
+      Interactive.pathTo(newctx.compilationUnit.tpdTree, pos.span)(using newctx)
+    val indexedCtx = IndexedContext(pos, path, newctx)
+    import indexedCtx.ctx
     val autoImportsGen = AutoImports.generator(
       pos,
       sourceText,
