@@ -1938,8 +1938,8 @@ class CompletionSuite extends BaseCompletionSuite:
         |  extension [T: Orde@@]
         |}
         |""".stripMargin,
-      """Ordered[T] scala.math
-        |Ordering[T] scala.math
+      """Ordered scala.math
+        |Ordering scala.math
         |""".stripMargin,
       topLines = Some(2)
     )
@@ -1951,8 +1951,8 @@ class CompletionSuite extends BaseCompletionSuite:
         |  extension [T: Ordering: Orde@@]
         |}
         |""".stripMargin,
-      """Ordered[T] scala.math
-        |Ordering[T] scala.math
+      """Ordered scala.math
+        |Ordering scala.math
         |""".stripMargin,
       topLines = Some(2)
     )
@@ -2251,4 +2251,14 @@ class CompletionSuite extends BaseCompletionSuite:
         |case class Miau(y: Int) derives Ordering, CanEqu@@
         |""".stripMargin,
       "CanEqual scala"
+    )
+
+  @Test def `context-bound-no-square-brackets` =
+    check(
+      """|trait Applicative[F[_]]
+         |trait Monadic[F[_]]
+         |
+         |def demo[F[_]: Applicative: Mona@@]: Unit = ???
+         |""".stripMargin,
+      "Monadic test"
     )
