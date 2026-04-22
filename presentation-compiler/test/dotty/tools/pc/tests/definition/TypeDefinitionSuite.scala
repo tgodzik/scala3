@@ -371,3 +371,15 @@ class TypeDefinitionSuite extends BasePcDefinitionSuite:
          |}
          |""".stripMargin
     )
+
+  @Test def `derives-typeclass-definition` =
+    check(
+      """|package bar
+         |trait <<Foo>>[T]
+         |
+         |object Foo:
+         |  def derived[T]: Foo[T] = ???
+         |
+         |case class Pet(name: String, kind: String) derives F@@oo
+         |""".stripMargin
+    )
