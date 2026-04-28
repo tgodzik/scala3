@@ -86,6 +86,11 @@ class Completions(
       case Ident(_) :: (templ: untpd.DerivingTemplate) :: _ =>
         val pos = completionPos.toSourcePosition
         !templ.derived.exists(_.sourcePos.contains(pos))
+        /* In case of `def demo[F[_]: TC@@]` or `def demo[F[_]: {TC1, TC@@}]`
+         * we shouldn't add `[]` as we are in a context bound position.
+         */
+      case Ident(_) :: (_: untpd.ContextBounds) :: _ => false
+      case Ident(_) :: (_: untpd.AppliedTypeTree) :: (_: untpd.ContextBounds) :: _ => false
       case _ => true)
 
   private lazy val isNew: Boolean = Completion.isInNewContext(adjustedPath)
